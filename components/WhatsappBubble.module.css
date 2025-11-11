@@ -1,0 +1,182 @@
+.whatsappBubble {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.icon {
+  width: 35px;
+  height: 35px;
+}
+
+.popup {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 320px;
+  min-height: 190px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  z-index: 1001;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.popupTop {
+  background-color: #25d366;
+  height: 100px;
+  color: white;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.popupIcon {
+  width: 45px;
+  height: 45px;
+  margin-right: 10px;
+}
+
+.popupTexts {
+  display: flex;
+  flex-direction: column;
+}
+
+.popupText {
+  font-size: 16px;
+  color: white;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+
+.bottomText {
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.popupBottom {
+  background-color: #ffffff;
+  padding: 10px;
+  height: auto;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.popupContact {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #25d366;
+  background: #f5f5f5;
+  border-left: 1px solid #25d366;
+  border-radius: 5px;
+  padding: 15px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.popupContact:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-5px);
+}
+
+.popupIconSmall {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.popupContactInfo {
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.contactName {
+  font-size: 14px;
+  color: #a7a7a7;
+  font-weight: bold;
+}
+
+.contactNumber {
+  color: #a7a7a7;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+/* Cerrar (X) animado */
+.closeIcon {
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  display: none;
+  stroke: white;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.closeIcon.active {
+  display: block;
+  animation: scaleBounce 0.4s ease-out forwards;
+}
+
+.line1,
+.line2 {
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  transition: stroke-dashoffset 0.3s ease-in-out;
+}
+
+.drawLine {
+  stroke-dashoffset: 0;
+}
+
+@keyframes scaleBounce {
+  0% {
+    transform: scale(0.5);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.rotate {
+  animation: rotateIcon 0.6s ease-in-out;
+}
+
+@keyframes rotateIcon {
+  0% {
+    transform: rotate(200deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
