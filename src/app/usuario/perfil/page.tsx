@@ -53,7 +53,7 @@ export default function PerfilUsuario() {
     async function fetchOrdenes() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://api.sgstudio.shop/ordenes`);
+        const res = await fetch(`https://backend-project-677e.onrender.com/ordenes`);
         const data = await res.json();
 
         // Filtrar órdenes del usuario
@@ -71,7 +71,7 @@ export default function PerfilUsuario() {
     async function fetchReclamos() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://api.sgstudio.shop/reclamos`);
+        const res = await fetch(`https://backend-project-677e.onrender.com/reclamos`);
         const data = await res.json();
         const reclamosUsuario = data.filter((r: any) => r.usuarioId === usuario.id);
         setReclamos(reclamosUsuario);
@@ -100,7 +100,7 @@ export default function PerfilUsuario() {
     async function fetchCarrito() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://api.sgstudio.shop/carrito/${usuario.id}`);
+        const res = await fetch(`https://backend-project-677e.onrender.com/carrito/${usuario.id}`);
         const data = await res.json();
         setCarrito(data.items);
       } catch (err) {
@@ -131,7 +131,7 @@ export default function PerfilUsuario() {
 
   const handleEliminarItem = async (itemId: number) => {
   try {
-    await fetch(`https://api.sgstudio.shop/carrito/item/${itemId}`, {
+    await fetch(`https://backend-project-677e.onrender.com/carrito/item/${itemId}`, {
       method: 'DELETE',
     });
 
@@ -151,7 +151,7 @@ export default function PerfilUsuario() {
     if (!confirmacion) return;
 
     try {
-      const res = await fetch(`https://api.sgstudio.shop/ordenes/${ordenId}`, {
+      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${ordenId}`, {
         method: 'DELETE',
       });
 
@@ -393,7 +393,7 @@ export default function PerfilUsuario() {
                   }
 
                   try {
-                    const res = await fetch('https://api.sgstudio.shop/reclamos', {
+                    const res = await fetch('https://backend-project-677e.onrender.com/reclamos', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',

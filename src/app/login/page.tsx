@@ -14,7 +14,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://api.sgstudio.shop/usuarios/login', {
+      const response = await fetch('https://backend-project-677e.onrender.com/usuarios/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -29,17 +29,16 @@ export default function LoginPage() {
 
         setMensaje('');
 
-      if (data.usuario.rol === 'admin') {
-        router.push('/admin/dashboard');
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
-      } else {
-        router.push('/');
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
-      }
+        if (data.usuario.rol === "admin") {
+          router.push("/admin/dashboard");
+        } else if (data.usuario.rol === "employee") {
+          router.push("/employee/dashboard");
+        } else {
+          router.push("/");
+        }
+
+        router.refresh();
+
       } else {
         setMensaje(data.error || 'Correo o contraseña incorrectos');
       }
@@ -85,10 +84,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full btn-animated"
-          >
+          <button type="submit" className="w-full btn-animated">
             Iniciar sesión
           </button>
         </form>
@@ -98,6 +94,7 @@ export default function LoginPage() {
             {mensaje}
           </div>
         )}
+
         <p className="mt-6 text-center text-sm text-gray-600">
           ¿No tienes una cuenta?{' '}
           <Link href="/registro" className="text-black font-medium hover:underline">
@@ -108,4 +105,3 @@ export default function LoginPage() {
     </main>
   );
 }
-  

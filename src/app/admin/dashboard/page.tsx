@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from './components/Sidebar';
 import ResumenDashboard from './components/ResumenDashboard';
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
     router.push('/login');
   };
 
-  const handleEditarProducto = (producto) => {
+  const handleEditarProducto = (producto: SetStateAction<null>) => {
     setProductoEditar(producto);
     setVista('editar-producto');
   };
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
         {vista === 'categorias' && (
           <div className="mt-6 flex flex-col lg:flex-row gap-6">
             <div className="bg-white p-6 rounded-xl shadow border w-full lg:w-1/3">
-              <CrearCategoriaForm />
+              <CrearCategoriaForm onCategoriaCreada={undefined} />
             </div>
             <div className="bg-white rounded-xl shadow border flex-1 max-h-[450px] overflow-y-auto">
               <div className="sticky top-0 bg-white px-4 py-3 border-b">

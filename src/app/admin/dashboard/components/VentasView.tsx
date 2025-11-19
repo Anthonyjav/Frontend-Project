@@ -27,7 +27,7 @@ export default function VentasView() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get<Orden[]>('https://api.sgstudio.shop/ordenes');
+        const { data } = await axios.get<Orden[]>('https://backend-project-677e.onrender.com/ordenes');
         setOrdenes(data);
       } catch (e) {
         setError('No se pudieron cargar las ventas 😓');

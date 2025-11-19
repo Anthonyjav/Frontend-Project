@@ -1,4 +1,3 @@
-// admin/dashboard/components/CrearCategoriaForm.jsx
 'use client';
 
 import { useState } from 'react';
@@ -17,7 +16,7 @@ export default function CrearCategoriaForm({ onCategoriaCreada }) {
     }
 
     try {
-      const res = await fetch('https://api.sgstudio.shop/categorias', {
+      const res = await fetch('https://backend-project-677e.onrender.com/categorias', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +35,6 @@ export default function CrearCategoriaForm({ onCategoriaCreada }) {
       setNombre('');
       setDescripcion('');
 
-      // Si el padre pasó la función, la llamamos para que recargue la lista
       if (typeof onCategoriaCreada === 'function') {
         onCategoriaCreada(data);
       }

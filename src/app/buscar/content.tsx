@@ -22,7 +22,7 @@ export default function BuscarContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('https://api.sgstudio.shop/productos')
+    fetch('https://backend-project-677e.onrender.com/productos')
       .then(res => {
         if (!res.ok) throw new Error('Error al cargar productos');
         return res.json();

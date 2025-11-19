@@ -92,7 +92,7 @@ export default function CheckoutPage() {
         setUsuario(user)
 
         try {
-          const response = await fetch(`https://api.sgstudio.shop/carrito/${user.id}`)
+          const response = await fetch(`https://backend-project-677e.onrender.com/carrito/${user.id}`)
           if (!response.ok) throw new Error('No se pudo obtener el carrito')
           const data = await response.json()
           setCarrito(data)
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      await axios.post('https://api.sgstudio.shop/ordenes', orden)
+      await axios.post('https://backend-project-677e.onrender.com/ordenes', orden)
       mostrarToast('¡Gracias por tu compra! 🛍️')
 
       const numeroWsp = '51944105915'
@@ -166,7 +166,7 @@ export default function CheckoutPage() {
 
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
       if (isLoggedIn && usuario?.id) {
-        await fetch(`https://api.sgstudio.shop/carrito/clear/${usuario.id}`, {
+        await fetch(`https://backend-project-677e.onrender.com/clear/${usuario.id}`, {
           method: 'DELETE'
         })
       } else {

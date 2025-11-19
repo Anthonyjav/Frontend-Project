@@ -30,8 +30,8 @@ export default function DashboardGraficos() {
   useEffect(() => {
     // Productos más vendidos
     Promise.all([
-      fetch('https://api.sgstudio.shop/orden-items').then(res => res.json()),
-      fetch('https://api.sgstudio.shop/productos').then(res => res.json()),
+      fetch('https://backend-project-677e.onrender.com/orden-items').then(res => res.json()),
+      fetch('https://backend-project-677e.onrender.com/productos').then(res => res.json()),
     ]).then(([ordenItems, productos]) => {
       const mapaNombres = productos.reduce((acc, prod) => {
         acc[prod.id] = prod.nombre;
@@ -53,7 +53,7 @@ export default function DashboardGraficos() {
     });
 
     // Órdenes e ingresos por día
-    fetch('https://api.sgstudio.shop/ordenes')
+    fetch('https://backend-project-677e.onrender.com/ordenes')
       .then(res => res.json())
       .then(ordenes => {
         const agrupado = ordenes.reduce((acc, orden) => {
@@ -72,7 +72,7 @@ export default function DashboardGraficos() {
       });
 
     // Usuarios por mes
-    fetch('https://api.sgstudio.shop/usuarios')
+    fetch('https://backend-project-677e.onrender.com/usuarios')
       .then(res => res.json())
       .then(usuarios => {
         const agrupado = usuarios.reduce((acc, u) => {
@@ -91,8 +91,8 @@ export default function DashboardGraficos() {
 
     // Productos por categoría
     Promise.all([
-      fetch('https://api.sgstudio.shop/productos').then(res => res.json()),
-      fetch('https://api.sgstudio.shop/categorias').then(res => res.json())
+      fetch('https://backend-project-677e.onrender.com/productos').then(res => res.json()),
+      fetch('https://backend-project-677e.onrender.com/categorias').then(res => res.json())
     ]).then(([productos, categorias]) => {
       const resumen = categorias.map(cat => {
         const cantidad = productos.filter(p => p.categoriaId === cat.id).length;

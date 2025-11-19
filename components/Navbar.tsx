@@ -36,14 +36,14 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    fetch('https://api.sgstudio.shop/categorias')
+    fetch('https://backend-project-677e.onrender.com/categorias')
       .then(res => res.json())
       .then(setCategorias)
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    fetch('https://api.sgstudio.shop/productos')
+    fetch('https://backend-project-677e.onrender.com/productos')
       .then(res => res.json())
       .then((data: Producto[]) => setAllProducts(data))
       .catch(console.error);
@@ -58,14 +58,14 @@ export default function Navbar() {
   const fetchCategoriasConProductos = async () => {
     try {
       // Obtener categorías
-      const resCat = await fetch('https://api.sgstudio.shop/categorias');
+      const resCat = await fetch('https://backend-project-677e.onrender.com/categorias');
       const categoriasDataRaw = await resCat.json();
 
       // Asegurarse de que sea array
       const categoriasData = Array.isArray(categoriasDataRaw) ? categoriasDataRaw : [];
 
       // Obtener productos
-      const resProd = await fetch('https://api.sgstudio.shop/productos');
+      const resProd = await fetch('https://backend-project-677e.onrender.com/productos');
       const productosDataRaw = await resProd.json();
       const productosData: Producto[] = Array.isArray(productosDataRaw) ? productosDataRaw : [];
 
@@ -129,7 +129,7 @@ export default function Navbar() {
   
     if (isLoggedIn && storedUser) {
       const user = JSON.parse(storedUser);
-      fetch(`https://api.sgstudio.shop/carrito/${user.id}`)
+      fetch(`https://backend-project-677e.onrender.com/carrito/${user.id}`)
         .then(res => res.json())
         .then(data => setCarrito(data.items))
         .catch(console.error);
@@ -143,7 +143,7 @@ export default function Navbar() {
   useEffect(() => {
   const fetchCategoriasSeleccionadas = async () => {
     try {
-      const res = await fetch('https://api.sgstudio.shop/productos/seleccionados');
+      const res = await fetch('https://backend-project-677e.onrender.com/productos/seleccionados');
       const data: Producto[] | any = await res.json();
 
       // Asegurarse que sea array
@@ -185,7 +185,7 @@ export default function Navbar() {
         const storedUser = localStorage.getItem('usuario');
         if (isLoggedIn && storedUser) {
           const user = JSON.parse(storedUser);
-          fetch(`https://api.sgstudio.shop/carrito/${user.id}`)
+          fetch(`https://backend-project-677e.onrender.com/carrito/${user.id}`)
             .then(res => res.json())
             .then(data => setCarrito(data.items))
             .catch(console.error);
@@ -225,7 +225,7 @@ export default function Navbar() {
 
   const removeItem = async (itemId: number) => {
     try {
-      const res = await fetch(`https://api.sgstudio.shop/carritoIitem/${itemId}`, {
+      const res = await fetch(`https://backend-project-677e.onrender.com/carritoIitem/${itemId}`, {
         method: 'DELETE',
       });
 
@@ -234,7 +234,7 @@ export default function Navbar() {
         const storedUser = localStorage.getItem('usuario');
         if (isLoggedIn && storedUser) {
           const user = JSON.parse(storedUser);
-          const updated = await fetch(`https://api.sgstudio.shop/carrito/${user.id}`);
+          const updated = await fetch(`https://backend-project-677e.onrender.com/carrito/${user.id}`);
           const data = await updated.json();
           setCarrito(data.items);
         } else {
@@ -260,7 +260,7 @@ export default function Navbar() {
       );
       if (isLoggedIn && user) {
         const updatedItem = updated.find(i => i.id === id);
-        fetch(`https://api.sgstudio.shop/carrito/${user.id}/actualizar/${id}`, {
+        fetch(`https://backend-project-677e.onrender.com/carrito/${user.id}/actualizar/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ cantidad: updatedItem?.cantidad }),

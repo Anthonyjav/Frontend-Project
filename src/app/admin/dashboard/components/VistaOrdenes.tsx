@@ -46,8 +46,8 @@ export default function VistaOrdenes() {
     async function fetchData() {
       try {
         const [ordenesRes, productosRes] = await Promise.all([
-          fetch('https://api.sgstudio.shop/ordenes'),
-          fetch('https://api.sgstudio.shop/productos'),
+          fetch('https://backend-project-677e.onrender.com/ordenes'),
+          fetch('https://backend-project-677e.onrender.com/productos'),
         ]);
 
         const ordenesData = await ordenesRes.json();
@@ -67,7 +67,7 @@ export default function VistaOrdenes() {
 
   const fetchOrdenItems = async (ordenId: number) => {
     try {
-      const res = await fetch('https://api.sgstudio.shop/orden-items');
+      const res = await fetch('https://backend-project-677e.onrender.com/orden-items');
       const data: OrdenItem[] = await res.json();
       const filtrados = data.filter((item) => item.ordenId === ordenId);
       setOrdenItems(filtrados);
@@ -78,7 +78,7 @@ export default function VistaOrdenes() {
 
   const cambiarEstado = async (id: number, estado: string) => {
     try {
-      const res = await fetch(`https://api.sgstudio.shop/ordenes/${id}`, {
+      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado }),
@@ -104,7 +104,7 @@ export default function VistaOrdenes() {
     if (!confirm('¿Deseas eliminar esta orden?')) return;
 
     try {
-      const res = await fetch(`https://api.sgstudio.shop/ordenes/${id}`, {
+      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Error al eliminar orden');
@@ -126,7 +126,7 @@ export default function VistaOrdenes() {
     if (!confirm('¿Deseas eliminar este producto de la orden?')) return;
 
     try {
-      const res = await fetch(`https://api.sgstudio.shop/orden-items/${id}`, {
+      const res = await fetch(`https://backend-project-677e.onrender.com/orden-items/${id}`, {
         method: 'DELETE',
       });
 
@@ -138,7 +138,7 @@ export default function VistaOrdenes() {
       // Recalcular y actualizar total
       const nuevoTotal = calcularTotal(nuevosItems);
 
-      await fetch(`https://api.sgstudio.shop/ordenes/${editandoId}`, {
+      await fetch(`https://backend-project-677e.onrender.com/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -168,7 +168,7 @@ export default function VistaOrdenes() {
 
       // Actualizar total después de guardar el item
       const nuevoTotal = calcularTotal(ordenItems);
-      await fetch(`https://api.sgstudio.shop/ordenes/${editandoId}`, {
+      await fetch(`https://backend-project-677e.onrender.com/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -204,7 +204,7 @@ export default function VistaOrdenes() {
 
     try {
       // Crear item nuevo en backend
-      const res = await fetch('https://api.sgstudio.shop/orden-items', {
+      const res = await fetch('https://backend-project-677e.onrender.com/orden-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -226,7 +226,7 @@ export default function VistaOrdenes() {
 
       // Actualizar total en backend y frontend
       const nuevoTotal = calcularTotal(nuevosItems);
-      await fetch(`https://api.sgstudio.shop/ordenes/${editandoId}`, {
+      await fetch(`https://backend-project-677e.onrender.com/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),

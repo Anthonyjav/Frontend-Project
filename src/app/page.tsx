@@ -8,6 +8,11 @@ import WhatsappBubble from '../../components/WhatsappBubble'
 import SplashScreen from '../../components/SplashScreen'
 import { useRouter } from 'next/navigation'
 
+function optimizeImage(url: string) {
+  if (!url.includes("/upload/")) return url
+  return url.replace("/upload/", "/upload/f_auto,q_auto,w_600/")
+}
+
 const slides = ['/images/LOGO.jpg', '/images/LOGO.jpg']
 
 function Slideshow({ slides, interval = 5000 }: { slides: string[]; interval?: number }) {
@@ -104,7 +109,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchProductos() {
       try {
-        const res = await fetch('https://api.sgstudio.shop/productos')
+        const res = await fetch('https://backend-project-677e.onrender.com/productos')
         if (!res.ok) throw new Error('Error al obtener productos')
         const data = await res.json()
         setProductos(data)
@@ -179,19 +184,23 @@ export default function Home() {
                     <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
                       <div className="relative w-full h-150 group">
                       <img
-                        src={imagen[0]}
+                        src={optimizeImage(imagen[0])}
                         alt={nombre}
+                        loading="lazy"
                         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                           imagen[1] ? 'group-hover:opacity-0' : ''
                         }`}
                       />
+
                       {imagen[1] && (
                         <img
-                          src={imagen[1]}
+                          src={optimizeImage(imagen[1])}
                           alt={`${nombre} alternativa`}
+                          loading="lazy"
                           className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         />
                       )}
+
                         {seleccionado && (
                           <div className="absolute top-2 left-2 z-10">
                             <span className="inline-block bg-black text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">

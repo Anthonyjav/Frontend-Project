@@ -46,7 +46,7 @@ export default function ProductoDetalle() {
     try {
       setLoading(true);
       setIsLoading(true);
-      const res = await fetch(`https://api.sgstudio.shop/productos/${id}`);
+      const res = await fetch(`https://backend-project-677e.onrender.com/productos/${id}`);
       if (!res.ok) throw new Error('Error al obtener el producto');
 
       const data = await res.json();
@@ -90,7 +90,7 @@ export default function ProductoDetalle() {
   useEffect(() => {
     async function fetchRecomendados() {
       try {
-        const res = await fetch('https://api.sgstudio.shop/productos');
+        const res = await fetch('https://backend-project-677e.onrender.com/productos');
         if (!res.ok) throw new Error('Error al obtener recomendados');
         const datos = await res.json();
         const otros = datos.filter((p: any) => String(p.id) !== String(idActual));
@@ -123,7 +123,7 @@ export default function ProductoDetalle() {
     }
 
     try {
-      const res = await fetch('https://api.sgstudio.shop/carrito/add', {
+      const res = await fetch('https://backend-project-677e.onrender.com/carrito/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
