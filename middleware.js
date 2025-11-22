@@ -15,7 +15,6 @@ export function middleware(request) {
     try {
       const usuario = JSON.parse(usuarioCookie.value);
 
-      // Roles permitidos para acceder al dashboard admin
       const rolesPermitidos = ['admin', 'employee'];
 
       

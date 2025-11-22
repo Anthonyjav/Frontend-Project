@@ -225,7 +225,7 @@ export default function Navbar() {
 
   const removeItem = async (itemId: number) => {
     try {
-      const res = await fetch(`https://backend-project-677e.onrender.com/carritoIitem/${itemId}`, {
+      const res = await fetch(`https://backend-project-677e.onrender.com/carritoItem/${itemId}`, {
         method: 'DELETE',
       });
 

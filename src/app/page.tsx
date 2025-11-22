@@ -6,6 +6,8 @@ import Link from 'next/link'
 import TextWithIcons from './components/TextWithIcons'
 import WhatsappBubble from '../../components/WhatsappBubble'
 import SplashScreen from '../../components/SplashScreen'
+import CyberCountdown from './components/CyberCountdown';
+
 import { useRouter } from 'next/navigation'
 
 function optimizeImage(url: string) {
@@ -142,7 +144,6 @@ export default function Home() {
     <div className="relative">
       <main className={`transition-filter duration-700 ${showSplash ? 'filter blur-sm pointer-events-none' : ''}`}>
         <Slideshow slides={slides} />
-
         {error && <p className="p-12 text-center text-red-600">{error}</p>}
         {!error && loading && <p className="p-12 text-center text-lg">Cargando productos...</p>}
 

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-// 🟦 IMPORT CORRECTO DEL SIDEBAR
 import EmployeeSidebar from "@/app/employee/dashboard/sidebarEmployee";
 
 import CrearCategoriaForm from "@/app/admin/dashboard/components/CrearCategoriaForm";

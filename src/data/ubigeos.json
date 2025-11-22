@@ -1,0 +1,26 @@
+{
+  "departments": [
+    {
+      "name": "Lima",
+      "provinces": [
+        {
+          "name": "Lima",
+          "districts": ["Miraflores", "San Isidro", "La Molina", "Surco"]
+        },
+        {
+          "name": "Huaral",
+          "districts": ["Huaral", "Aucallama"]
+        }
+      ]
+    },
+    {
+      "name": "La Libertad",
+      "provinces": [
+        {
+          "name": "Trujillo",
+          "districts": ["Trujillo", "Victor Larco", "Laredo"]
+        }
+      ]
+    }
+  ]
+}

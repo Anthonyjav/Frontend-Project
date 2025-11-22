@@ -43,16 +43,22 @@ export default function ListarUsuarios() {
 
   const actualizarUsuario = async (usuario: Usuario) => {
     try {
+      const body = {
+        rol: usuario.rol,
+      };
+
       await fetch(`https://backend-project-677e.onrender.com/usuarios/${usuario.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(usuario),
+        body: JSON.stringify(body),
       });
+
       setEditandoId(null);
     } catch (error) {
       console.error('Error al actualizar usuario:', error);
     }
   };
+
 
   const eliminarUsuario = async (id: number) => {
     if (!confirm('¿Eliminar este usuario?')) return;

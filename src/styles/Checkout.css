@@ -1,0 +1,131 @@
+/* Checkout.css */
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif!important;
+  background-color: #fcfcfc!important;
+}
+
+h2 {
+  font-size: 18px !important;
+  color    : #0f0f0f;
+}
+
+li {
+  padding-right: 5px;
+  font-weight: 700;
+  font-family: "News Cycle", "Arial Narrow Bold", sans-serif;
+}
+
+.container {
+  border-radius: 4px;
+}
+
+.left-column,
+.right-column,
+.center-column {
+  flex   : 1;
+  padding: 20px;
+  padding-bottom: 0;
+}
+
+.customer-details,
+.billing-details,
+.payment-form,
+.result-form {
+  background-color: rgb(240, 238, 238);
+  margin-bottom   : 20px;
+  padding         : 20px;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .checkout-container {
+    flex-flow: column;
+    min-width: 80%;
+  }
+
+  .left-column,
+  .right-column {
+    width: 100%;
+  }
+}
+
+.form-group label {
+  font-size: 0.8rem;
+}
+
+.form-control {
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  height: auto;
+  color: #111;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+}
+
+.form-control::placeholder {
+  color: #9aa1a8;
+  opacity: 1;
+}
+
+.form-control:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.06);
+}
+
+/* Form section visual improvements */
+.form-section {
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16,24,40,0.03);
+}
+.form-section + .form-section { margin-top: 12px; }
+
+/* Soft placeholder and input focus styles */
+.form-control::placeholder { color: #9aa1a8 !important; }
+.form-control:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.08) !important; /* subtle blue focus */
+  font-weight: 700 !important; /* bold while typing */
+}
+
+/* Select visual */
+.form-control.select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #000 50%), linear-gradient(135deg, #000 50%, transparent 50%), linear-gradient(to right, #e5e7eb, #e5e7eb);
+  background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px), 100% 0;
+  background-size: 5px 5px, 5px 5px, 1.5em 1.5em;
+  background-repeat: no-repeat;
+  padding-right: 2.5rem;
+}
+
+/* Make labels slightly muted */
+.form-label { color: #374151; font-weight: 600; font-size: 0.9rem; }
+
+.form-group {
+  margin-bottom: 10px!important;
+}
+
+.btn-primary {
+  width: 100%;
+  background-color: #FF2D46!important;
+  height: 50px;
+}
+
+pre {
+  background-color: #000000;
+  color: rgb(0, 0, 0)!important;
+}
+
+#micuentawebstd_rest_wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+details summary h2 {
+  display: inline;
+  margin: 0;
+}
