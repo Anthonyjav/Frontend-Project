@@ -25,8 +25,10 @@ export default function ProductoDetalle() {
   const [mostrarCuidado, setMostrarCuidado] = useState(false);
   const [mostrarDescripcion, setMostrarDescripcion] = useState(false);
   const [mostrarComposicion, setMostrarComposicion] = useState(false);
-  const [colorSeleccionado, setColorSeleccionado] = useState<string | null>(null);
-  const [tallaSeleccionada, setTallaSeleccionada] = useState<string | null>(null);
+
+  // Selección de opciones del producto
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
@@ -42,6 +44,19 @@ export default function ProductoDetalle() {
     setToastMessage(mensaje);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 1500);
+  };
+
+  const isValidCssColor = (value: string | null) => {
+    if (!value) return false;
+    try {
+      const s = value.trim();
+      const el = document.createElement('div');
+      el.style.color = '';
+      el.style.color = s;
+      return !!el.style.color;
+    } catch (e) {
+      return false;
+    }
   };
 
   const fetchProducto = async (id: string | number) => {
@@ -63,14 +78,24 @@ export default function ProductoDetalle() {
         ? data.imagen.map(ajustarURL)
         : [];
 
-      setProducto({ ...data, imagen: imagenesAjustadas });
+      const prod = { ...data, imagen: imagenesAjustadas };
+      setProducto(prod);
+      try {
+        const colorsRaw = prod.color || '';
+        const sizesRaw = prod.talla || '';
+        const colors = Array.isArray(colorsRaw)
+          ? colorsRaw
+          : String(colorsRaw).split(',').map((s: string) => s.trim()).filter((s: string) => s);
+        const sizes = Array.isArray(sizesRaw)
+          ? sizesRaw
+          : String(sizesRaw).split(',').map((s: string) => s.trim()).filter((s: string) => s);
+        if (colors.length) setSelectedColor(colors[0]);
+        if (sizes.length) setSelectedSize(sizes[0]);
+      } catch (e) {
+        setSelectedColor(null);
+        setSelectedSize(null);
+      }
       setImagenSeleccionada(imagenesAjustadas?.[0] || null);
-
-      const colores = data.color ? data.color.split(',') : [];
-      const tallas = data.talla ? data.talla.split(',') : [];
-      setColorSeleccionado(colores[0] || null);
-      setTallaSeleccionada(null); // No pre-seleccionar talla
-
       setCantidad(1);
       setError(null);
     } catch (error: any) {
@@ -125,11 +150,6 @@ export default function ProductoDetalle() {
       return;
     }
 
-    if (!tallaSeleccionada) {
-      mostrarToast('Por favor, selecciona una talla');
-      return;
-    }
-
     if (cantidad < 1) {
       mostrarToast('La cantidad debe ser al menos 1');
       return;
@@ -142,9 +162,9 @@ export default function ProductoDetalle() {
         body: JSON.stringify({
           usuarioId: userId,
           productoId: producto.id,
-          cantidad,
-          talla: tallaSeleccionada,
-          color: colorSeleccionado || producto.color.split(',')[0],
+            cantidad,
+            talla: selectedSize || 'M',
+            color: selectedColor || (Array.isArray(producto?.color) ? producto.color[0] : String(producto?.color || 'negro').split(',')[0]),
         }),
       });
 
@@ -162,9 +182,6 @@ export default function ProductoDetalle() {
   };
 
   const { nombre, precio, imagen = [], color, talla } = producto || {};
-
-  const coloresDisponibles = color ? color.split(',') : [];
-  const tallasDisponibles = talla ? talla.split(',') : [];
 
   return (
     <>
@@ -253,39 +270,59 @@ export default function ProductoDetalle() {
               <h1 className="font-[Montserrat] text-6xl mb-1">{nombre}</h1>
               <p className="font-[Montserrat] text-2xl">PEN {precio}</p>
               <hr />
-              
-              {/* Selección de Color */}
-              <div>
-                <h5 className="font-[Montserrat] text-sm mb-2">Color: <span className="font-semibold"></span></h5>
-                <div className="flex flex-wrap gap-2">
-                  {coloresDisponibles.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setColorSeleccionado(c)}
-                      className={`w-8 h-8 rounded-full border-2 transition-transform duration-200 ${colorSeleccionado === c ? 'ring-2 ring-offset-1 ring-black scale-110' : 'border-gray-200'}`}
-                      style={{ backgroundColor: c.toLowerCase() }}
-                      title={c}
-                    />
-                  ))}
+              <div className="flex flex-col gap-3">
+                <div>
+                  <p className="text-sm font-medium mb-2">Color</p>
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const colorsRaw = producto?.color || '';
+                      const colors = Array.isArray(colorsRaw)
+                        ? colorsRaw
+                        : String(colorsRaw).split(',').map((s: string) => s.trim()).filter((s: string) => s);
+                      if (!colors.length) return <p className="text-sm text-gray-500">Sin opciones</p>;
+                      return colors.map((c: string, i: number) => {
+                        const valid = isValidCssColor(c);
+                        const isSelected = selectedColor === c;
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => setSelectedColor(c)}
+                            title={c}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center border ${isSelected ? 'ring-2 ring-black' : 'border-gray-200'}`}
+                            style={{ backgroundColor: valid ? c : 'transparent' }}
+                          >
+                            {!valid && <span className="text-xs text-gray-700">{c}</span>}
+                          </button>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium mb-2">Talla</p>
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const sizesRaw = producto?.talla || '';
+                      const sizes = Array.isArray(sizesRaw)
+                        ? sizesRaw
+                        : String(sizesRaw).split(',').map((s: string) => s.trim()).filter((s: string) => s);
+                      if (!sizes.length) return <p className="text-sm text-gray-500">Sin tallas</p>;
+                      return sizes.map((s: string, idx: number) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedSize(s)}
+                          className={`px-3 py-1 border rounded text-sm ${selectedSize === s ? 'bg-black text-white' : 'bg-white text-gray-700'}`}
+                        >
+                          {s}
+                        </button>
+                      ));
+                    })()}
+                  </div>
                 </div>
               </div>
 
-              {/* Selección de Talla */}
-              <div>
-                <h5 className="font-[Montserrat] text-sm mb-2">Talla: <span className="font-semibold">{tallaSeleccionada}</span></h5>
-                <div className="flex flex-wrap gap-2">
-                  {tallasDisponibles.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setTallaSeleccionada(t)}
-                      className={`px-4 py-2 border rounded text-sm font-medium transition-colors duration-200 ${
-                        tallaSeleccionada === t ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300 hover:bg-gray-100'
-                      }`}
-                    >{t}</button>
-                  ))}
-                </div>
-              </div>
-              
+
               <div className="mb-4">
                 <label className="block text-sm font-[Montserrat] mb-1">Cantidad:</label>
                 {producto.cantidad === 0 ? (

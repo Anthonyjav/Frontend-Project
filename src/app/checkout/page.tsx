@@ -191,19 +191,26 @@ export default function CheckoutPage() {
         country: "PE",
         state: form.state,
         city: form.city,
+        distrito: form.city || form.district || null,
+        referencia: form.reference || null,
         zipCode: form.zipCode,
         shippingMethod: form.shippingMethod,
 
         metadata: {
           usuarioId: String(usuarioId),
           orderId: String(orderIdToUse),
+          referencia: form.reference || null,
+          distrito: form.city || form.district || null,
+          shippingMethod: form.shippingMethod || null,
           items: JSON.stringify(
             carrito.items.map((item: any) => ({
               productoId: item.producto.id,
               nombreProducto: item.producto.nombre,
               precio: item.producto.precio,
               cantidad: item.cantidad,
-              talla: item.talla || null
+              talla: item.talla || null,
+              color: item.color || null,
+              imagen: (item.producto && item.producto.imagen && item.producto.imagen[0]) || null
             }))
           )
         }
@@ -291,12 +298,17 @@ useEffect(() => {
   metadataInput.value = JSON.stringify({
     usuarioId,
     orderId: currentOrderId,
+    referencia: form.reference || null,
+    distrito: form.city || form.district || null,
+    shippingMethod: form.shippingMethod || null,
     items: carrito.items.map((item: any) => ({
       productoId: item.producto.id,
       nombreProducto: item.producto.nombre,
       precio: item.producto.precio,
       cantidad: item.cantidad,
-      talla: item.talla || null
+      talla: item.talla || null,
+        color: item.color || null,
+        imagen: (item.producto && item.producto.imagen && item.producto.imagen[0]) || null
     }))
   });
   // Log temporal para depuración en cliente: ver el contenido del input oculto

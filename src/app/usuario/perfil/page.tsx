@@ -45,6 +45,10 @@ export default function PerfilUsuario() {
   const [reclamos, setReclamos] = useState<any[]>([]);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderDetails, setOrderDetails] = useState<any | null>(null);
+  const [loadingOrderDetails, setLoadingOrderDetails] = useState(false);
+  const [showRawOrder, setShowRawOrder] = useState(false);
 
 
   const router = useRouter();
@@ -165,6 +169,204 @@ export default function PerfilUsuario() {
       console.error('Error:', error);
       alert('Hubo un problema al eliminar la orden.');
     }
+  };
+
+  const openOrderDetails = async (ordenId: number) => {
+    try {
+      setLoadingOrderDetails(true);
+      setShowRawOrder(false);
+      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${ordenId}`);
+      if (!res.ok) throw new Error('Error al obtener detalle de la orden');
+      const data = await res.json();
+      console.log('DETALLE ORDEN RAW', data);
+      setOrderDetails(data);
+      setShowOrderModal(true);
+    } catch (err) {
+      console.error('Error fetching order details', err);
+      mostrarToast('No se pudo cargar los detalles de la orden');
+    } finally {
+      setLoadingOrderDetails(false);
+    }
+  };
+
+  const extractPaymentMethod = (d: any) => {
+    if (!d) return 'N/D';
+    return (
+      d.paymentMethod ||
+      d.paymentResponse?.paymentMethod ||
+      d.transactions?.[0]?.paymentMethod ||
+      d.paymentResponse?.method ||
+      (d.metadata && (d.metadata.paymentMethod || d.metadata.method)) ||
+      'N/D'
+    );
+  };
+
+  const getPaymentInfo = (d: any) => {
+    if (!d) return { label: 'N/D' };
+    const tx = d.paymentResponse?.transactions?.[0] || d.transactions?.[0] || null;
+    const brand = tx?.transactionDetails?.cardDetails?.effectiveBrand || tx?.transactionDetails?.paymentMethodDetails?.effectiveBrand || d.paymentResponse?.card?.brand || d.paymentResponse?.paymentMethod || null;
+    // try to find last4
+    const pan = tx?.transactionDetails?.cardDetails?.cardHolderPan || d.paymentResponse?.card?.last4 || d.paymentResponse?.card?.last_digits || null;
+    const last = pan ? String(pan).slice(-4) : null;
+    const type = tx?.paymentMethodType || tx?.paymentMethod || d.paymentResponse?.paymentMethodType || d.paymentMethodType || null;
+    const label = brand ? `${brand}${last ? ' • ****' + last : ''}` : (type || extractPaymentMethod(d) || 'N/D');
+    return { brand, last, type, label };
+  };
+
+  const extractShippingMethod = (d: any) => {
+    if (!d) return 'N/D';
+    return (
+      d.metodoEnvio ||
+      d.shippingMethod ||
+      d.shipping?.method ||
+      d.paymentResponse?.transactions?.[0]?.metadata?.metodoEnvio ||
+      d.paymentResponse?.transactions?.[0]?.metadata?.shippingMethod ||
+      d.paymentResponse?.customer?.shippingDetails?.shippingMethod ||
+      (d.metadata && (d.metadata.metodoEnvio || d.metadata.shippingMethod)) ||
+      'N/D'
+    );
+  };
+
+  // Devuelve un objeto con campos de envío normalizados: metodoEnvio, referencia, distrito, direccion, telefono
+  const getShippingInfo = (d: any) => {
+    if (!d) return {};
+    const metaTx = d.paymentResponse?.transactions?.[0]?.metadata || (d.transactions && d.transactions[0] && d.transactions[0].metadata) || {};
+    const customerShip = d.paymentResponse?.customer?.shippingDetails || d.customer?.shippingDetails || {};
+
+    const metodoEnvio = d.metodoEnvio || d.shippingMethod || metaTx.metodoEnvio || metaTx.shippingMethod || customerShip.shippingMethod || (d.metadata && (d.metadata.metodoEnvio || d.metadata.shippingMethod)) || null;
+    const referencia = d.referencia || metaTx.referencia || customerShip.reference || d.reference || (d.metadata && d.metadata.referencia) || null;
+    const distrito = d.distrito || metaTx.distrito || customerShip.district || d.shippingAddress?.district || null;
+    const direccion = d.direccion || d.address || customerShip.address || d.shippingAddress?.address || d.customer?.billingDetails?.address || null;
+    const telefono = d.telefono || customerShip.phoneNumber || d.customer?.billingDetails?.phoneNumber || null;
+
+    return { metodoEnvio, referencia, distrito, direccion, telefono };
+  };
+
+  const getItemColor = (it: any) => {
+    // Prioridad: item directo -> producto -> metadata.items (transacción) -> atributos varios
+    const direct = it.color || it.colour || it.colorName || it.attributes?.color;
+    if (direct) return direct;
+
+    const prodColor = (it.producto as any)?.color;
+    if (prodColor) {
+      if (typeof prodColor === 'string') return prodColor.split(',')[0];
+      return prodColor;
+    }
+
+    // Buscar en metadata.items parseada
+    const metaItems = parseMetadataItems(orderDetails || {});
+    if (metaItems && metaItems.length) {
+      const found = metaItems.find((mi: any) => String(mi.productoId || mi.producto_id || mi.id) === String(it.productoId || it.producto?.id || it.productoId));
+      if (found) {
+        return found.color || found.colour || found.colorName || null;
+      }
+    }
+
+    // Otros campos posibles
+    if (it.metadata && it.metadata.color) return it.metadata.color;
+    return 'N/D';
+  };
+
+  const colorNameToHex = (name: string | null) => {
+    if (!name) return null;
+    const map: Record<string, string> = {
+      negro: '#000000',
+      blanco: '#FFFFFF',
+      rojo: '#FF0000',
+      azul: '#0000FF',
+      verde: '#008000',
+      amarillo: '#FFFF00',
+      gris: '#808080',
+      naranja: '#FFA500',
+      marron: '#8B4513',
+      beige: '#F5F5DC',
+      rosa: '#FFC0CB',
+      morado: '#800080',
+      fucsia: '#FF00FF',
+      camel: '#C19A6B'
+    };
+    const key = String(name).trim().toLowerCase();
+    if (map[key]) return map[key];
+    // If name is already a color (hex or rgb), return as-is
+    return key.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i) ? name : null;
+  };
+
+  const normalizeColorForStyle = (raw: string | null) => {
+    if (!raw) return null;
+    // try map
+    const mapped = colorNameToHex(raw);
+    if (mapped) return mapped;
+    // try using browser to validate
+    try {
+      const el = document.createElement('div');
+      el.style.backgroundColor = '';
+      el.style.backgroundColor = raw as string;
+      // some browsers normalize values; check if set
+      if (el.style.backgroundColor) return raw;
+    } catch (e) {
+      // ignore
+    }
+    return null;
+  };
+
+  const getItemSize = (it: any) => {
+    return (
+      it.talla ||
+      it.size ||
+      it.attributes?.size ||
+      (it.producto as any)?.talla?.split?.(',')?.[0] ||
+      (it.metadata && it.metadata.size) ||
+      'N/D'
+    );
+  };
+
+  const parseMetadataItems = (order: any) => {
+    try {
+      const txMeta = order?.paymentResponse?.transactions?.[0]?.metadata;
+      if (!txMeta) return [];
+      const rawItems = txMeta.items;
+      if (!rawItems) return [];
+      if (Array.isArray(rawItems)) return rawItems;
+      // puede venir como stringified JSON
+      if (typeof rawItems === 'string') {
+        try {
+          return JSON.parse(rawItems);
+        } catch (e) {
+          // a veces metadata.items es una cadena con comillas escapadas
+          try {
+            const cleaned = rawItems.replace(/\\"/g, '"');
+            return JSON.parse(cleaned);
+          } catch (ee) {
+            return [];
+          }
+        }
+      }
+      return [];
+    } catch (err) {
+      return [];
+    }
+  };
+
+  const getItemImage = (it: any) => {
+    // 1) si el item trae imagen directa
+    if (it.imagen) return it.imagen;
+    if (it.producto && it.producto.imagen && it.producto.imagen[0]) return it.producto.imagen[0];
+
+    // 2) intentar extraer desde orderDetails.paymentResponse.transactions[0].metadata.items
+    const metaItems = parseMetadataItems(orderDetails || {});
+    if (metaItems && metaItems.length) {
+      const found = metaItems.find((mi: any) => String(mi.productoId || mi.producto_id || mi.id) === String(it.productoId || it.producto?.id || it.productoId));
+      if (found) {
+        // varios nombres posibles: imagen, image, imagenUrl
+        return found.imagen || found.image || found.imagenUrl || found.imageUrl || null;
+      }
+    }
+
+    // 3) intentar otras rutas en el item
+    if (it.image) return it.image;
+    if (it.imageUrl) return it.imageUrl;
+
+    return null;
   };
 
 
@@ -302,6 +504,15 @@ export default function PerfilUsuario() {
                </button>
              )}
 
+            <div className="mt-4">
+              <button
+                onClick={() => openOrderDetails(orden.id)}
+                className="inline-block px-3 py-1 text-sm border rounded hover:bg-gray-100"
+              >
+                Ver detalles
+              </button>
+            </div>
+
              <p className="text-sm text-gray-600">Orden #{index + 1}</p>
              <p className="text-lg font-semibold">Total: PEN {orden.total.toFixed(2)}</p>
              <p className="text-sm text-gray-500">
@@ -427,6 +638,107 @@ export default function PerfilUsuario() {
                 Enviar reclamo
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showOrderModal && orderDetails && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-16">
+          <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 mx-4 overflow-auto max-h-[80vh]">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-semibold">Detalle Orden #{orderDetails.id || orderDetails.orderId || '—'}</h3>
+                <p className="text-sm text-gray-600">Estado: <span className="font-medium">{orderDetails.estado || orderDetails.status || 'N/D'}</span></p>
+                <p className="text-sm text-gray-600">Total: PEN {Number(orderDetails.total || orderDetails.amount || 0).toFixed(2)}</p>
+                <p className="text-sm text-gray-500">Fecha: {orderDetails.createdAt ? new Date(orderDetails.createdAt).toLocaleString() : (orderDetails.date ? new Date(orderDetails.date).toLocaleString() : 'N/D')}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowRawOrder(!showRawOrder)} className="px-2 py-1 text-sm border rounded">{showRawOrder ? 'Ocultar raw' : 'Mostrar raw'}</button>
+                <button onClick={() => { setShowOrderModal(false); setOrderDetails(null); }} className="px-3 py-1 bg-red-50 text-red-600 border rounded">Cerrar</button>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-semibold">Método de pago</h4>
+                {(() => {
+                  const p = getPaymentInfo(orderDetails);
+                  return (
+                    <div>
+                      <p className="text-sm text-gray-700">{p.label}</p>
+                      {p.brand && (
+                        <div className="mt-2 text-sm text-gray-600 flex items-center gap-3">
+                          <span className="px-2 py-1 bg-gray-100 rounded text-xs font-medium">{p.brand}</span>
+                          {p.last && <span className="text-xs text-gray-500">••••{p.last}</span>}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div>
+                <h4 className="font-semibold">Método de envío</h4>
+                {(() => {
+                  const s = getShippingInfo(orderDetails);
+                  return (
+                    <div>
+                      <p className="text-sm text-gray-700">{s.metodoEnvio || 'N/D'}</p>
+                      <div className="mt-2 text-sm text-gray-600">
+                        {s.direccion && <p>{s.direccion}</p>}
+                        {(s.direccion || s.distrito) && <p>{s.distrito ? `Distrito: ${s.distrito}` : null}</p>}
+                        {s.referencia && <p>Referencia: {s.referencia}</p>}
+                        {s.telefono && <p>Tel: {s.telefono}</p>}
+                        {!s.direccion && !s.distrito && !s.referencia && !s.telefono && (
+                          <p className="text-sm text-gray-500">No hay detalles de envío disponibles</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h4 className="font-semibold">Items</h4>
+              <div className="mt-2 space-y-3">
+                {((orderDetails.items && orderDetails.items.length) ? orderDetails.items : (orderDetails.ordenItems || orderDetails.itemsDetalle || orderDetails.orderItems || [])).map((it: any, idx: number) => (
+                  <div key={idx} className="flex items-center gap-4 border p-3 rounded">
+                    {(() => {
+                      const img = getItemImage(it);
+                      return img ? (
+                        <img src={img} alt={it.nombre || it.producto?.nombre || 'Producto'} className="w-16 h-16 object-cover rounded" />
+                      ) : (
+                        <div className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded text-xs text-gray-500">Sin imagen</div>
+                      );
+                    })()}
+                    <div className="flex-1">
+                      <p className="font-medium">{it.nombre || it.producto?.nombre || it.title || 'Producto'}</p>
+                      <p className="text-sm text-gray-600">Cantidad: {it.cantidad || it.quantity || 1}</p>
+                      <p className="text-sm text-gray-600">Talla: {getItemSize(it)}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-gray-600">Color: {getItemColor(it)}</p>
+                        {(() => {
+                          const rawColor = getItemColor(it);
+                          const cssColor = normalizeColorForStyle(rawColor === 'N/D' ? null : rawColor);
+                          if (cssColor) {
+                            return <span className="w-5 h-5 rounded-full" style={{ backgroundColor: cssColor, border: '1px solid #ddd' }} />;
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-700">PEN {Number(it.precio || it.price || it.unitPrice || 0).toFixed(2)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {showRawOrder && (
+              <div className="mt-6 bg-gray-50 p-3 rounded text-xs overflow-auto">
+                <pre className="whitespace-pre-wrap">{JSON.stringify(orderDetails, null, 2)}</pre>
+              </div>
+            )}
           </div>
         </div>
       )}
