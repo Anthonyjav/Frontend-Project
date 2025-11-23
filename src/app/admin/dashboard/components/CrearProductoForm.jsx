@@ -11,8 +11,8 @@ export default function CrearProductoForm() {
   const [imagenes, setImagenes] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [mensaje, setMensaje] = useState('');
-  const [color, setColor] = useState('');
-  const [talla, setTalla] = useState('');
+  const [coloresSeleccionados, setColoresSeleccionados] = useState([]);
+  const [tallasSeleccionadas, setTallasSeleccionadas] = useState([]);
   const [cantidad, setCantidad] = useState('');
   const [composicion, setComposicion] = useState('');
   const [info, setInfo] = useState('');
@@ -48,10 +48,14 @@ export default function CrearProductoForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!nombre || !precio || !categoriaId || !color || !talla || !cantidad || !composicion || !info || !cuidados) {
+    if (!nombre || !precio || !categoriaId || coloresSeleccionados.length === 0 || tallasSeleccionadas.length === 0 || !cantidad || !composicion || !info || !cuidados) {
       setMensaje('Por favor, completa los campos requeridos');
       return;
     }
+
+    // Convertimos los arrays a strings separados por comas para el envío
+    const color = coloresSeleccionados.join(',');
+    const talla = tallasSeleccionadas.join(',');
 
     const formData = new FormData();
     formData.append('nombre', nombre);
@@ -83,8 +87,8 @@ export default function CrearProductoForm() {
       setDescripcion('');
       setPrecio('');
       setCategoriaId('');
-      setColor('');
-      setTalla('');
+      setColoresSeleccionados([]);
+      setTallasSeleccionadas([]);
       setCantidad('');
       setComposicion('');
       setInfo('');
@@ -94,6 +98,38 @@ export default function CrearProductoForm() {
     } catch (error) {
       setMensaje('Error al conectar con el servidor');
       console.error(error);
+    }
+  };
+
+  // --- Opciones para seleccionar ---
+  const availableColors = [
+    { name: 'Rojo', hex: '#DC2626' },
+    { name: 'Azul', hex: '#2563EB' },
+    { name: 'Verde', hex: '#16A34A' },
+    { name: 'Negro', hex: '#000000' },
+    { name: 'Blanco', hex: '#FFFFFF' },
+    { name: 'Gris', hex: '#4B5563' },
+    { name: 'Amarillo', hex: '#CA8A04' },
+  ];
+  const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+  const handleColorChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setColoresSeleccionados((prev) => [...prev, value]); // value será el hex
+    } else {
+      setColoresSeleccionados((prev) => prev.filter((hex) => hex !== value));
+    }
+  };
+
+  const handleTallaChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setTallasSeleccionadas((prev) => [...prev, value]);
+    } else {
+      setTallasSeleccionadas((prev) =>
+        prev.filter((talla) => talla !== value)
+      );
     }
   };
 
@@ -146,14 +182,31 @@ export default function CrearProductoForm() {
 
         {/* Columna 2 */}
         <div className="space-y-4">
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            placeholder="Color *"
-            required
-            className="w-full px-4 py-2 rounded-md border border-gray-200 bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Colores *</label>
+            <div className="grid grid-cols-3 gap-2 p-2 rounded-md border border-gray-200 bg-gray-100">
+              {availableColors.map((color) => (
+                <label key={color.name} className="flex items-center space-x-2 text-sm text-gray-800 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    value={color.hex}
+                    checked={coloresSeleccionados.includes(color.hex)}
+                    onChange={handleColorChange}
+                    className="rounded border-gray-300 text-gray-600 shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50"
+                  />
+                  <span
+                    className={`w-4 h-4 rounded-full inline-block ${
+                      color.name === 'Blanco' ? 'border border-gray-400' : ''
+                    }`}
+                    style={{ backgroundColor: color.hex }}
+                  ></span>
+                  <span>
+                    {color.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <input
             type="number"
@@ -171,14 +224,23 @@ export default function CrearProductoForm() {
             rows={2}
             className="w-full px-4 py-2 rounded-md border border-gray-200 bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
-
-          <textarea
-            value={talla}
-            onChange={(e) => setTalla(e.target.value)}
-            placeholder="Talla"
-            rows={2}
-            className="w-full px-4 py-2 rounded-md border border-gray-200 bg-gray-100 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Tallas *</label>
+            <div className="grid grid-cols-3 gap-2 p-2 rounded-md border border-gray-200 bg-gray-100">
+              {availableSizes.map((talla) => (
+                <label key={talla} className="flex items-center space-x-2 text-sm text-gray-800">
+                  <input
+                    type="checkbox"
+                    value={talla}
+                    checked={tallasSeleccionadas.includes(talla)}
+                    onChange={handleTallaChange}
+                    className="rounded border-gray-300 text-gray-600 shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50"
+                  />
+                  <span>{talla}</span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Campos globales */}

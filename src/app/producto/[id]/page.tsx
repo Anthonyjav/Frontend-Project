@@ -25,6 +25,8 @@ export default function ProductoDetalle() {
   const [mostrarCuidado, setMostrarCuidado] = useState(false);
   const [mostrarDescripcion, setMostrarDescripcion] = useState(false);
   const [mostrarComposicion, setMostrarComposicion] = useState(false);
+  const [colorSeleccionado, setColorSeleccionado] = useState<string | null>(null);
+  const [tallaSeleccionada, setTallaSeleccionada] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
@@ -63,6 +65,12 @@ export default function ProductoDetalle() {
 
       setProducto({ ...data, imagen: imagenesAjustadas });
       setImagenSeleccionada(imagenesAjustadas?.[0] || null);
+
+      const colores = data.color ? data.color.split(',') : [];
+      const tallas = data.talla ? data.talla.split(',') : [];
+      setColorSeleccionado(colores[0] || null);
+      setTallaSeleccionada(null); // No pre-seleccionar talla
+
       setCantidad(1);
       setError(null);
     } catch (error: any) {
@@ -117,6 +125,11 @@ export default function ProductoDetalle() {
       return;
     }
 
+    if (!tallaSeleccionada) {
+      mostrarToast('Por favor, selecciona una talla');
+      return;
+    }
+
     if (cantidad < 1) {
       mostrarToast('La cantidad debe ser al menos 1');
       return;
@@ -130,8 +143,8 @@ export default function ProductoDetalle() {
           usuarioId: userId,
           productoId: producto.id,
           cantidad,
-          talla: 'M',
-          color: producto.color || 'negro',
+          talla: tallaSeleccionada,
+          color: colorSeleccionado || producto.color.split(',')[0],
         }),
       });
 
@@ -149,6 +162,9 @@ export default function ProductoDetalle() {
   };
 
   const { nombre, precio, imagen = [], color, talla } = producto || {};
+
+  const coloresDisponibles = color ? color.split(',') : [];
+  const tallasDisponibles = talla ? talla.split(',') : [];
 
   return (
     <>
@@ -237,10 +253,39 @@ export default function ProductoDetalle() {
               <h1 className="font-[Montserrat] text-6xl mb-1">{nombre}</h1>
               <p className="font-[Montserrat] text-2xl">PEN {precio}</p>
               <hr />
-              <h5 className="font-[Montserrat] text-sm">{color}</h5>
-              <h5 className="font-[Montserrat] text-sm">Tallas disponibles {talla}</h5>
+              
+              {/* Selección de Color */}
+              <div>
+                <h5 className="font-[Montserrat] text-sm mb-2">Color: <span className="font-semibold"></span></h5>
+                <div className="flex flex-wrap gap-2">
+                  {coloresDisponibles.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setColorSeleccionado(c)}
+                      className={`w-8 h-8 rounded-full border-2 transition-transform duration-200 ${colorSeleccionado === c ? 'ring-2 ring-offset-1 ring-black scale-110' : 'border-gray-200'}`}
+                      style={{ backgroundColor: c.toLowerCase() }}
+                      title={c}
+                    />
+                  ))}
+                </div>
+              </div>
 
-
+              {/* Selección de Talla */}
+              <div>
+                <h5 className="font-[Montserrat] text-sm mb-2">Talla: <span className="font-semibold">{tallaSeleccionada}</span></h5>
+                <div className="flex flex-wrap gap-2">
+                  {tallasDisponibles.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTallaSeleccionada(t)}
+                      className={`px-4 py-2 border rounded text-sm font-medium transition-colors duration-200 ${
+                        tallaSeleccionada === t ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300 hover:bg-gray-100'
+                      }`}
+                    >{t}</button>
+                  ))}
+                </div>
+              </div>
+              
               <div className="mb-4">
                 <label className="block text-sm font-[Montserrat] mb-1">Cantidad:</label>
                 {producto.cantidad === 0 ? (
