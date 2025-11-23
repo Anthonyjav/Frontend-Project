@@ -435,32 +435,31 @@ const bgClass = scrolled || hovered || showSearch
           </Link>
 
           <ul className="flex gap-6 text-sm font-medium items-center">
-            {/* WOMAN */}
-            <li
-              className="relative group"
-              onMouseEnter={handleHoverEnter}
-              onMouseLeave={handleHoverLeave}
-            >
-              <Link href="/woman" className={`underline-hover transition ${
-                hovered || scrolled 
-                ? 'text-black hover:text-gray-600' 
-                : 'text-black hover:text-gray-300'
-              }`}>
-                WOMAN
-              </Link>
-
-              <div className={`absolute left-0 top-full mt-5 w-64 bg-white shadow-lg p-4 pt-6 text-sm z-10
-                transition-opacity duration-300 ease-out
-                ${isHoveringWoman ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            {Array.isArray(categorias) && categorias.length > 0 && (
+              <li
+                className="relative group"
+                onMouseEnter={handleHoverEnter}
+                onMouseLeave={handleHoverLeave}
               >
-                {/* Línea superior animada */}
-                <div className={`absolute top-0 left-0 h-[3px] bg-gray-800 transition-all duration-500 origin-left
-                  ${isHoveringWoman ? 'w-full' : 'w-0'}`}
-                ></div>
+                <Link href="/woman" className={`underline-hover transition ${
+                  hovered || scrolled 
+                  ? 'text-black hover:text-gray-600' 
+                  : 'text-black hover:text-gray-300'
+                }`}>
+                  WOMAN
+                </Link>
 
-                <ul className="space-y-5 text-black">
-                  {categorias.length > 0 ? (
-                    categorias.map((cat, i) => (
+                <div className={`absolute left-0 top-full mt-5 w-64 bg-white shadow-lg p-4 pt-6 text-sm z-10
+                  transition-opacity duration-300 ease-out
+                  ${isHoveringWoman ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                >
+                  {/* Línea superior animada */}
+                  <div className={`absolute top-0 left-0 h-[3px] bg-gray-800 transition-all duration-500 origin-left
+                    ${isHoveringWoman ? 'w-full' : 'w-0'}`}
+                  ></div>
+
+                  <ul className="space-y-5 text-black">
+                    {categorias.map((cat, i) => (
                       <li
                         key={cat.id}
                         className={`transition duration-500 ease-out transform ${
@@ -475,40 +474,37 @@ const bgClass = scrolled || hovered || showSearch
                           {cat.nombre}
                         </Link>
                       </li>
-                    ))
-                  ) : (
-                    <li className="text-gray-500">Cargando...</li>
-                  )}
-                </ul>
-              </div>
-            </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            )}
 
-            {/* NEW ARRIVALS */}
-            <li
-              className="relative group"
-              onMouseEnter={handleHoverEnterNewArrivals}
-              onMouseLeave={handleHoverLeaveNewArrivals}
-            >
-              <Link href="/newarrivals" className={`underline-hover transition ${
-                hovered || scrolled
-                  ? 'text-black hover:text-gray-600'
-                  : 'text-black hover:text-gray-300'
-              }`}>
-                NEW ARRIVALS
-              </Link>
-
-              <div className={`absolute left-0 top-full mt-5 w-64 bg-white shadow-lg p-4 pt-6 text-sm z-10
-                transition-opacity duration-300 ease-out
-                ${isHoveringNewArrivals ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            {Array.isArray(categoriasSeleccionadas) && categoriasSeleccionadas.length > 0 && (
+              <li
+                className="relative group"
+                onMouseEnter={handleHoverEnterNewArrivals}
+                onMouseLeave={handleHoverLeaveNewArrivals}
               >
-                {/* Línea superior animada */}
-                <div className={`absolute top-0 left-0 h-[3px] bg-gray-800 transition-all duration-500 origin-left
-                  ${isHoveringNewArrivals ? 'w-full' : 'w-0'}`}
-                ></div>
+                <Link href="/newarrivals" className={`underline-hover transition ${
+                  hovered || scrolled
+                    ? 'text-black hover:text-gray-600'
+                    : 'text-black hover:text-gray-300'
+                }`}>
+                  NEW ARRIVALS
+                </Link>
 
-                <ul className="space-y-5 text-black">
-                  {categoriasSeleccionadas.length > 0 ? (
-                    categoriasSeleccionadas.map((cat, i) => (
+                <div className={`absolute left-0 top-full mt-5 w-64 bg-white shadow-lg p-4 pt-6 text-sm z-10
+                  transition-opacity duration-300 ease-out
+                  ${isHoveringNewArrivals ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                >
+                  {/* Línea superior animada */}
+                  <div className={`absolute top-0 left-0 h-[3px] bg-gray-800 transition-all duration-500 origin-left
+                    ${isHoveringNewArrivals ? 'w-full' : 'w-0'}`}
+                  ></div>
+
+                  <ul className="space-y-5 text-black">
+                    {categoriasSeleccionadas.map((cat, i) => (
                       <li
                         key={cat.id}
                         className={`transition duration-500 ease-out transform ${
@@ -523,13 +519,11 @@ const bgClass = scrolled || hovered || showSearch
                           {cat.nombre}
                         </Link>
                       </li>
-                    ))
-                  ) : (
-                    <li className="text-gray-500">Cargando...</li>
-                  )}
-                </ul>
-              </div>
-            </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            )}
           </ul>
 
                   

@@ -29,6 +29,9 @@ export default function CheckoutPage() {
     currency: 'PEN',
   });
 
+  // Generador seguro de orderId (útil si se necesita forzar uno antes de enviar)
+  const generateOrderId = () => `SG-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
   const [formToken, setFormToken] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
@@ -167,8 +170,15 @@ export default function CheckoutPage() {
         0
       );
 
+      // Asegurar orderId antes de armar el payload
+      const orderIdToUse = form.orderId || generateOrderId();
+      if (!form.orderId) setForm(prev => ({ ...prev, orderId: orderIdToUse }));
+
       // 4. Preparar body para enviar al backend
       const bodyIzipay = {
+        // Asegurar que el backend reciba orderId y metodoEnvio para persistirlos
+        orderId: orderIdToUse,
+        metodoEnvio: form.shippingMethod || null,
         amount: subtotal * 1, // IZIPAY usa centavos
         currency: form.currency,
         email: form.email,
@@ -186,7 +196,7 @@ export default function CheckoutPage() {
 
         metadata: {
           usuarioId: String(usuarioId),
-          orderId: String(form.orderId),
+          orderId: String(orderIdToUse),
           items: JSON.stringify(
             carrito.items.map((item: any) => ({
               productoId: item.producto.id,
@@ -272,12 +282,15 @@ useEffect(() => {
 
   // Los parámetros extra van mediante inputs ocultos
   // Enviar metadata correctamente a IziPay
+  const currentOrderId = form.orderId || generateOrderId();
+  if (!form.orderId) setForm(prev => ({ ...prev, orderId: currentOrderId }));
+
   const metadataInput = document.createElement("input");
   metadataInput.type = "hidden";
   metadataInput.name = "kr-hash-metadata";
   metadataInput.value = JSON.stringify({
     usuarioId,
-    orderId: form.orderId,
+    orderId: currentOrderId,
     items: carrito.items.map((item: any) => ({
       productoId: item.producto.id,
       nombreProducto: item.producto.nombre,
@@ -294,7 +307,7 @@ useEffect(() => {
   const orderIdInput = document.createElement("input");
   orderIdInput.type = "hidden";
   orderIdInput.name = "kr-hash-orderId";
-  orderIdInput.value = form.orderId;
+  orderIdInput.value = String(currentOrderId);
   container.appendChild(orderIdInput);
 
 
