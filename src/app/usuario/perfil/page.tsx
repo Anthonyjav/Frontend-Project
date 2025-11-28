@@ -57,7 +57,7 @@ export default function PerfilUsuario() {
     async function fetchOrdenes() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://backend-project-677e.onrender.com/ordenes`);
+        const res = await fetch(`https://backend-project-v2.onrender.com/ordenes`);
         const data = await res.json();
 
         // Filtrar órdenes del usuario
@@ -75,7 +75,7 @@ export default function PerfilUsuario() {
     async function fetchReclamos() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://backend-project-677e.onrender.com/reclamos`);
+        const res = await fetch(`https://backend-project-v2.onrender.com/reclamos`);
         const data = await res.json();
         const reclamosUsuario = data.filter((r: any) => r.usuarioId === usuario.id);
         setReclamos(reclamosUsuario);
@@ -104,7 +104,7 @@ export default function PerfilUsuario() {
     async function fetchCarrito() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://backend-project-677e.onrender.com/carrito/${usuario.id}`);
+        const res = await fetch(`https://backend-project-v2.onrender.com/carrito/${usuario.id}`);
         const data = await res.json();
         setCarrito(data.items);
       } catch (err) {
@@ -135,7 +135,7 @@ export default function PerfilUsuario() {
 
   const handleEliminarItem = async (itemId: number) => {
   try {
-    await fetch(`https://backend-project-677e.onrender.com/carrito/item/${itemId}`, {
+    await fetch(`https://backend-project-v2.onrender.com/carrito/item/${itemId}`, {
       method: 'DELETE',
     });
 
@@ -155,7 +155,7 @@ export default function PerfilUsuario() {
     if (!confirmacion) return;
 
     try {
-      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${ordenId}`, {
+      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${ordenId}`, {
         method: 'DELETE',
       });
 
@@ -175,7 +175,7 @@ export default function PerfilUsuario() {
     try {
       setLoadingOrderDetails(true);
       setShowRawOrder(false);
-      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${ordenId}`);
+      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${ordenId}`);
       if (!res.ok) throw new Error('Error al obtener detalle de la orden');
       const data = await res.json();
       console.log('DETALLE ORDEN RAW', data);
@@ -604,7 +604,7 @@ export default function PerfilUsuario() {
                   }
 
                   try {
-                    const res = await fetch('https://backend-project-677e.onrender.com/reclamos', {
+                    const res = await fetch('https://backend-project-v2.onrender.com/reclamos', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -653,7 +653,6 @@ export default function PerfilUsuario() {
                 <p className="text-sm text-gray-500">Fecha: {orderDetails.createdAt ? new Date(orderDetails.createdAt).toLocaleString() : (orderDetails.date ? new Date(orderDetails.date).toLocaleString() : 'N/D')}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => setShowRawOrder(!showRawOrder)} className="px-2 py-1 text-sm border rounded">{showRawOrder ? 'Ocultar raw' : 'Mostrar raw'}</button>
                 <button onClick={() => { setShowOrderModal(false); setOrderDetails(null); }} className="px-3 py-1 bg-red-50 text-red-600 border rounded">Cerrar</button>
               </div>
             </div>
@@ -700,7 +699,7 @@ export default function PerfilUsuario() {
             </div>
 
             <div className="mt-6">
-              <h4 className="font-semibold">Items</h4>
+              <h4 className="font-semibold">Productos</h4>
               <div className="mt-2 space-y-3">
                 {((orderDetails.items && orderDetails.items.length) ? orderDetails.items : (orderDetails.ordenItems || orderDetails.itemsDetalle || orderDetails.orderItems || [])).map((it: any, idx: number) => (
                   <div key={idx} className="flex items-center gap-4 border p-3 rounded">

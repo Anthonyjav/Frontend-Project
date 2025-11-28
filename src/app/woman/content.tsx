@@ -22,8 +22,8 @@ export default function WomanContent() {
     const fetchData = async () => {
       try {
         const [resProd, resCat] = await Promise.all([
-          fetch('https://backend-project-677e.onrender.com/productos'),
-          fetch('https://backend-project-677e.onrender.com/categorias'),
+          fetch('https://backend-project-v2.onrender.com/productos'),
+          fetch('https://backend-project-v2.onrender.com/categorias'),
         ])
         setProductos(await resProd.json())
         setCategorias(await resCat.json())

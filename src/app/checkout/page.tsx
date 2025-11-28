@@ -47,7 +47,7 @@ export default function CheckoutPage() {
         const user = JSON.parse(storedUser);
         try {
           const response = await fetch(
-            `https://backend-project-677e.onrender.com/carrito/${user.id}`
+            `https://backend-project-v2.onrender.com/carrito/${user.id}`
           );
           const data = await response.json();
           setCarrito(data);
@@ -221,7 +221,7 @@ export default function CheckoutPage() {
       // Log temporal para depuración: ver exactamente lo que enviamos
       console.log("[IziPay] bodyIzipay ->", bodyIzipay);
       const res = await axios.post(
-        "https://backend-project-677e.onrender.com/api/izipay/form-token",
+        "https://backend-project-v2.onrender.com/api/izipay/form-token",
         bodyIzipay,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -275,17 +275,22 @@ useEffect(() => {
   container.setAttribute("kr-form-token", formToken);
   container.setAttribute("kr-language", "es-PE");
   container.setAttribute(
-    "kr-public-key",
-    "84426447:testpublickey_QCOElYQ9EppkGyhK4vn9LVgZaoq5sgvrriJkgDpiei39L"
+      "kr-public-key",
+      "84426447:testpublickey_QCOElYQ9EppkGyhK4vn9LVgZaoq5sgvrriJkgDpiei39L"
   );
 
-  // 5️⃣ ENVIAR METADATA A TU BACKEND (Izipay NO LO GUARDA)
+  // 5️⃣ CONFIGURAR URLs DE REDIRECCIÓN EN IZIPAY
+  // kr-post-url-success: cuando el pago es EXITOSO
   container.setAttribute(
     "kr-post-url-success",
-    `https://backend-project-677e.onrender.com/api/izipay/pago-exitoso`
+    "https://backend-project-v2.onrender.com/api/izipay/pago-exitoso"
   );
-
-
+  
+  // kr-post-url-refused: cuando el pago es RECHAZADO/FALLIDO
+  container.setAttribute(
+    "kr-post-url-refused", 
+    "http://localhost:3000/usuario/perfil?success=false"
+  );
 
   // Los parámetros extra van mediante inputs ocultos
   // Enviar metadata correctamente a IziPay
@@ -321,9 +326,6 @@ useEffect(() => {
   orderIdInput.name = "kr-hash-orderId";
   orderIdInput.value = String(currentOrderId);
   container.appendChild(orderIdInput);
-
-
-  container.setAttribute("kr-post-url-refused", "https://sgstudio.shop/pago-fallido");
 
   const button = document.createElement("button");
   button.className = "kr-payment-button";

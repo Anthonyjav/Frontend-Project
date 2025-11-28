@@ -16,7 +16,7 @@ export default function CrearCategoriaForm({ onCategoriaCreada }) {
     }
 
     try {
-      const res = await fetch('https://backend-project-677e.onrender.com/categorias', {
+      const res = await fetch('https://backend-project-v2.onrender.com/categorias', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

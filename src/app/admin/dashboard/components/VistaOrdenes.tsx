@@ -7,8 +7,25 @@ type Orden = {
   usuarioId: number;
   nombre?: string;
   apellido?: string;
+  email?: string;
+  telefono?: string;
+  pais?: string;
+  departamento?: string;
+  provincia?: string;
+  distrito?: string;
+  direccion?: string;
+  referencia?: string;
+  metodoEnvio?: string;
   estado: string;
   total: number;
+  subtotal?: number;
+  envio?: number;
+  transactionId?: string;
+  paymentStatus?: string;
+  paymentDate?: string;
+  orderIdIzipay?: string;
+  shippingMethod?: string;
+  paymentResponse?: any;
   createdAt: string;
 };
 
@@ -37,6 +54,7 @@ export default function VistaOrdenes() {
 
   const [productoParaAgregar, setProductoParaAgregar] = useState<number | null>(null);
   const [agregandoProducto, setAgregandoProducto] = useState(false);
+  const [modalDetalle, setModalDetalle] = useState<Orden | null>(null);
 
   const calcularTotal = (items: OrdenItem[]) => {
     return items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
@@ -46,8 +64,8 @@ export default function VistaOrdenes() {
     async function fetchData() {
       try {
         const [ordenesRes, productosRes] = await Promise.all([
-          fetch('https://backend-project-677e.onrender.com/ordenes'),
-          fetch('https://backend-project-677e.onrender.com/productos'),
+          fetch('https://backend-project-v2.onrender.com/ordenes'),
+          fetch('https://backend-project-v2.onrender.com/productos'),
         ]);
 
         const ordenesData = await ordenesRes.json();
@@ -67,7 +85,7 @@ export default function VistaOrdenes() {
 
   const fetchOrdenItems = async (ordenId: number) => {
     try {
-      const res = await fetch('https://backend-project-677e.onrender.com/orden-items');
+      const res = await fetch('https://backend-project-v2.onrender.com/orden-items');
       const data: OrdenItem[] = await res.json();
       const filtrados = data.filter((item) => item.ordenId === ordenId);
       setOrdenItems(filtrados);
@@ -76,9 +94,66 @@ export default function VistaOrdenes() {
     }
   };
 
+  const abrirModalDetalle = async (orden: Orden) => {
+    try {
+      let ordenCompleta: Orden;
+      
+      // Si no tenemos los detalles completos, traerlos del backend
+      if (!orden.email) {
+        const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${orden.id}`);
+        ordenCompleta = await res.json();
+      } else {
+        ordenCompleta = orden;
+      }
+      
+      // Extraer metadata del paymentResponse
+      const metadata = extractMetadata(ordenCompleta);
+      
+      // Agregar datos de metadata a la orden si existen
+      if (metadata) {
+        if (metadata.shippingMethod) ordenCompleta.shippingMethod = metadata.shippingMethod;
+        if (metadata.referencia) ordenCompleta.referencia = metadata.referencia;
+        if (metadata.orderId) ordenCompleta.orderIdIzipay = metadata.orderId;
+      }
+      
+      setModalDetalle(ordenCompleta);
+      await fetchOrdenItems(ordenCompleta.id);
+    } catch (error) {
+      console.error('Error al obtener detalles:', error);
+    }
+  };
+
+  const cerrarModalDetalle = () => {
+    setModalDetalle(null);
+  };
+
+  // Función auxiliar para verificar si un valor es válido
+  const hasValue = (value: any): boolean => {
+    return value !== null && value !== undefined && value !== '';
+  };
+
+  // Función para extraer metadata del paymentResponse
+  const extractMetadata = (orden: Orden) => {
+    try {
+      if (!orden.paymentResponse) return {};
+      const response = typeof orden.paymentResponse === 'string' 
+        ? JSON.parse(orden.paymentResponse) 
+        : orden.paymentResponse;
+      
+      const tx = response.transactions?.[0];
+      if (tx?.metadata) {
+        return typeof tx.metadata === 'string' ? JSON.parse(tx.metadata) : tx.metadata;
+      }
+      return {};
+    } catch (e) {
+      console.error('Error extracting metadata:', e);
+      return {};
+    }
+  };
+
   const cambiarEstado = async (id: number, estado: string) => {
     try {
-      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${id}`, {
+      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado }),
@@ -104,7 +179,7 @@ export default function VistaOrdenes() {
     if (!confirm('¿Deseas eliminar esta orden?')) return;
 
     try {
-      const res = await fetch(`https://backend-project-677e.onrender.com/ordenes/${id}`, {
+      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Error al eliminar orden');
@@ -126,7 +201,7 @@ export default function VistaOrdenes() {
     if (!confirm('¿Deseas eliminar este producto de la orden?')) return;
 
     try {
-      const res = await fetch(`https://backend-project-677e.onrender.com/orden-items/${id}`, {
+      const res = await fetch(`https://backend-project-v2.onrender.com/orden-items/${id}`, {
         method: 'DELETE',
       });
 
@@ -138,7 +213,7 @@ export default function VistaOrdenes() {
       // Recalcular y actualizar total
       const nuevoTotal = calcularTotal(nuevosItems);
 
-      await fetch(`https://backend-project-677e.onrender.com/ordenes/${editandoId}`, {
+      await fetch(`https://backend-project-v2.onrender.com/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -168,7 +243,7 @@ export default function VistaOrdenes() {
 
       // Actualizar total después de guardar el item
       const nuevoTotal = calcularTotal(ordenItems);
-      await fetch(`https://backend-project-677e.onrender.com/ordenes/${editandoId}`, {
+      await fetch(`https://backend-project-v2.onrender.com/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -204,7 +279,7 @@ export default function VistaOrdenes() {
 
     try {
       // Crear item nuevo en backend
-      const res = await fetch('https://backend-project-677e.onrender.com/orden-items', {
+      const res = await fetch('https://backend-project-v2.onrender.com/orden-items', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -226,7 +301,7 @@ export default function VistaOrdenes() {
 
       // Actualizar total en backend y frontend
       const nuevoTotal = calcularTotal(nuevosItems);
-      await fetch(`https://backend-project-677e.onrender.com/ordenes/${editandoId}`, {
+      await fetch(`https://backend-project-v2.onrender.com/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -296,6 +371,8 @@ export default function VistaOrdenes() {
                     >
                       <option value="pendiente">Pendiente</option>
                       <option value="completado">Completado</option>
+                      <option value="Enviado">Enviado</option>
+
                     </select>
                   ) : (
                     <span className="capitalize">{orden.estado}</span>
@@ -344,6 +421,20 @@ export default function VistaOrdenes() {
                         }`}
                       >
                         Editar
+                      </button>
+                      <button
+                        disabled={editandoId !== null}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          abrirModalDetalle(orden);
+                        }}
+                        className={`px-2 py-1 border border-black rounded text-xs ${
+                          editandoId !== null
+                            ? 'text-gray-400 cursor-not-allowed'
+                            : 'text-black hover:bg-black hover:text-white'
+                        }`}
+                      >
+                        Ver Detalles
                       </button>
                       <button
                         disabled={editandoId !== null}
@@ -498,6 +589,236 @@ export default function VistaOrdenes() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* PANEL DETALLE EN LA PARTE INFERIOR */}
+      {modalDetalle && (
+        <div className="mt-8 border-2 border-black rounded-lg overflow-hidden shadow-lg">
+          {/* Encabezado del panel */}
+          <div className="bg-black text-white p-4 flex justify-between items-center">
+            <h2 className="text-2xl font-bold">📋 Detalles Orden #{modalDetalle.id}</h2>
+            <button
+              onClick={cerrarModalDetalle}
+              className="text-3xl font-bold hover:text-gray-300"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Contenido del panel */}
+          <div className="p-6 bg-white space-y-6">
+            {/* FILA 1: Cliente y contacto */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-gray-600 text-sm font-semibold">Nombre</p>
+                <p className="text-black text-lg">{modalDetalle.nombre} {modalDetalle.apellido}</p>
+              </div>
+              {hasValue(modalDetalle.email) && (
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">Email</p>
+                  <p className="text-black text-lg">{modalDetalle.email}</p>
+                </div>
+              )}
+              {hasValue(modalDetalle.telefono) && (
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">Teléfono</p>
+                  <p className="text-black text-lg">{modalDetalle.telefono}</p>
+                </div>
+              )}
+              {hasValue(modalDetalle.usuarioId) && (
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">Usuario ID</p>
+                  <p className="text-black text-lg">{modalDetalle.usuarioId}</p>
+                </div>
+              )}
+            </div>
+
+            {/* FILA 2: Dirección */}
+            {(hasValue(modalDetalle.pais) || hasValue(modalDetalle.departamento) || hasValue(modalDetalle.provincia) || hasValue(modalDetalle.distrito) || hasValue(modalDetalle.direccion)) && (
+              <div className="border-t pt-4">
+                <p className="text-black font-bold mb-3">📍 Dirección de Envío</p>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {hasValue(modalDetalle.pais) && (
+                    <div>
+                      <p className="text-gray-600 text-sm">País</p>
+                      <p className="text-black">{modalDetalle.pais}</p>
+                    </div>
+                  )}
+                  {hasValue(modalDetalle.departamento) && (
+                    <div>
+                      <p className="text-gray-600 text-sm">Departamento</p>
+                      <p className="text-black">{modalDetalle.departamento}</p>
+                    </div>
+                  )}
+                  {hasValue(modalDetalle.provincia) && (
+                    <div>
+                      <p className="text-gray-600 text-sm">Provincia</p>
+                      <p className="text-black">{modalDetalle.provincia}</p>
+                    </div>
+                  )}
+                  {hasValue(modalDetalle.distrito) && (
+                    <div>
+                      <p className="text-gray-600 text-sm">Distrito</p>
+                      <p className="text-black">{modalDetalle.distrito}</p>
+                    </div>
+                  )}
+                </div>
+               
+                {hasValue(modalDetalle.referencia) && (
+                  <div className="mt-2">
+                    <p className="text-gray-600 text-sm">Referencia</p>
+                    <p className="text-black">{modalDetalle.referencia}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* FILA 3: Envío y Pago */}
+            {(() => {
+              const metadata = extractMetadata(modalDetalle);
+              const shippingMethodFromMeta = metadata?.shippingMethod || modalDetalle.shippingMethod;
+              const referenciaFromMeta = metadata?.referencia || modalDetalle.referencia;
+              
+              return (hasValue(modalDetalle.metodoEnvio) || hasValue(shippingMethodFromMeta) || hasValue(modalDetalle.paymentStatus) || hasValue(modalDetalle.paymentDate) || hasValue(modalDetalle.transactionId) || hasValue(modalDetalle.orderIdIzipay) || hasValue(referenciaFromMeta)) ? (
+                <div className="border-t pt-4">
+                  <p className="text-black font-bold mb-3">📦 Envío y Pago</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {hasValue(modalDetalle.metodoEnvio) && (
+                      <div>
+                        <p className="text-gray-600 text-sm">Método de Envío (BD)</p>
+                        <p className="text-black capitalize">{modalDetalle.metodoEnvio}</p>
+                      </div>
+                    )}
+                    {hasValue(shippingMethodFromMeta) && (
+                      <div>
+                        <p className="text-gray-600 text-sm">Método de Envío (Pago)</p>
+                        <p className="text-black capitalize">{shippingMethodFromMeta}</p>
+                      </div>
+                    )}
+                    {hasValue(modalDetalle.paymentStatus) && (
+                      <div>
+                        <p className="text-gray-600 text-sm">Estado de Pago</p>
+                        <p className="text-black capitalize">{modalDetalle.paymentStatus}</p>
+                      </div>
+                    )}
+                    {hasValue(modalDetalle.paymentDate) && (
+                      <div>
+                        <p className="text-gray-600 text-sm">Fecha de Pago</p>
+                        <p className="text-black">
+                          {modalDetalle.paymentDate && new Date(modalDetalle.paymentDate).toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {hasValue(modalDetalle.transactionId) && (
+                      <div>
+                        <p className="text-gray-600 text-sm">ID de Transacción</p>
+                        <p className="text-black text-xs break-all">{modalDetalle.transactionId}</p>
+                      </div>
+                    )}
+                    {hasValue(modalDetalle.orderIdIzipay) && (
+                      <div>
+                        <p className="text-gray-600 text-sm">Order ID IziPay</p>
+                        <p className="text-black text-xs break-all">{modalDetalle.orderIdIzipay}</p>
+                      </div>
+                    )}
+                  </div>
+                  {hasValue(referenciaFromMeta) && (
+                    <div className="mt-4">
+                      <p className="text-gray-600 text-sm">Referencia</p>
+                      <p className="text-black">{referenciaFromMeta}</p>
+                    </div>
+                  )}
+                </div>
+              ) : null;
+            })()}
+
+            {/* FILA 4: Productos */}
+            <div className="border-t pt-4">
+              <p className="text-black font-bold mb-3">🛍️ Productos de la Orden</p>
+              <table className="w-full border border-gray-300 text-sm">
+                <thead className="bg-gray-200">
+                  <tr>
+                    <th className="px-4 py-2 border text-left">Producto</th>
+                    <th className="px-4 py-2 border text-center">Cantidad</th>
+                    <th className="px-4 py-2 border text-right">Precio Unit.</th>
+                    <th className="px-4 py-2 border text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ordenItems.length > 0 ? (
+                    ordenItems.map((item) => (
+                      <tr key={item.id} className="border hover:bg-gray-50">
+                        <td className="px-4 py-2 border">
+                          {getNombreProducto(item.productoId)}
+                        </td>
+                        <td className="px-4 py-2 border text-center">{item.cantidad}</td>
+                        <td className="px-4 py-2 border text-right">
+                          PEN {item.precio.toFixed(2)}
+                        </td>
+                        <td className="px-4 py-2 border text-right font-semibold">
+                          PEN {(item.precio * item.cantidad).toFixed(2)}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-2 border text-center text-gray-500">
+                        No hay productos en esta orden
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* FILA 5: Resumen financiero */}
+            <div className="border-t pt-4 bg-gray-100 p-4 rounded">
+              <p className="text-black font-bold mb-3">💰 Resumen Financiero</p>
+              <div className="space-y-2 text-right">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="text-black font-semibold">
+                    PEN {(Number(modalDetalle.subtotal) || 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Envío:</span>
+                  <span className="text-black font-semibold">
+                    PEN {(Number(modalDetalle.envio) || 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="border-t-2 pt-2 flex justify-between text-lg">
+                  <span className="text-black font-bold">Total:</span>
+                  <span className="text-black font-bold text-xl">
+                    PEN {Number(modalDetalle.total).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* FILA 6: Estado y Fecha */}
+            <div className="border-t pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-gray-600 text-sm font-semibold">Estado de Orden</p>
+                <p className="text-black text-lg font-bold capitalize">{modalDetalle.estado}</p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-sm font-semibold">Fecha de Creación</p>
+                <p className="text-black">{new Date(modalDetalle.createdAt).toLocaleString()}</p>
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={cerrarModalDetalle}
+                  className="w-full px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-semibold"
+                >
+                  Cerrar Detalles
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -21,7 +21,7 @@ export default function CrearProductoForm() {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await fetch('https://backend-project-677e.onrender.com/categorias');
+        const res = await fetch('https://backend-project-v2.onrender.com/categorias');
         const data = await res.json();
         setCategorias(data);
       } catch (error) {
@@ -71,7 +71,7 @@ export default function CrearProductoForm() {
     imagenes.forEach((img) => formData.append('imagen', img));
 
     try {
-      const res = await fetch('https://backend-project-677e.onrender.com/productos', {
+      const res = await fetch('https://backend-project-v2.onrender.com/productos', {
         method: 'POST',
         body: formData,
       });

@@ -22,7 +22,7 @@ export default function BuscarContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('https://backend-project-677e.onrender.com/productos')
+    fetch('https://backend-project-v2.onrender.com/productos')
       .then(res => {
         if (!res.ok) throw new Error('Error al cargar productos');
         return res.json();

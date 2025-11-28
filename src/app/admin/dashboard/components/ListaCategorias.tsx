@@ -16,7 +16,7 @@ export default function ListaCategorias() {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const res = await fetch('https://backend-project-677e.onrender.com/categorias');
+        const res = await fetch('https://backend-project-v2.onrender.com/categorias');
         const data = await res.json();
         setCategorias(data);
       } catch (err) {
@@ -36,7 +36,7 @@ export default function ListaCategorias() {
 
     try {
       const res = await fetch(
-        `https://backend-project-677e.onrender.com/categorias/${id}`,
+        `https://backend-project-v2.onrender.com/categorias/${id}`,
         { method: 'DELETE' }
       );
 
