@@ -218,8 +218,8 @@ export default function ProductoDetalle() {
                 <button
                   key={index}
                   onClick={() => setImagenSeleccionada(img)}
-                  className={`border rounded overflow-hidden w-[60px] h-[80px] hover:opacity-80 transition ${
-                    imagenSeleccionada === img ? 'ring-2 ring-black' : ''
+                  className={`w-[60px] h-[80px] overflow-hidden hover:opacity-80 transition ${
+                    imagenSeleccionada === img ? 'border border-black' : 'border-none'
                   }`}
                 >
                   <Image
@@ -228,7 +228,7 @@ export default function ProductoDetalle() {
                     width={60}
                     height={80}
                     unoptimized
-                    className="object-cover"
+                    className="object-cover w-full h-full"
                   />
                 </button>
               ))}
@@ -256,7 +256,7 @@ export default function ProductoDetalle() {
                   fill
                   unoptimized
                   style={{
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                     transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                     transform: isHovering ? 'scale(2)' : 'scale(1)',
                     transition: 'transform 0.2s ease',
@@ -266,14 +266,14 @@ export default function ProductoDetalle() {
               )}
             </div>
 
-            <div className="order-2 lg:order-3 space-y-4 text-gray-800">
-              <h1 className="font-[Montserrat] text-6xl mb-1">{nombre}</h1>
-              <p className="font-[Montserrat] text-2xl">PEN {precio}</p>
-              <hr />
+            <div className="order-2 lg:order-3 space-y-6">
+              <h3 className="font-light text-5xl mb-3">{nombre}</h3>
+              <p className="font-medium text-2xl text-gray-500 mb-10">S/ {precio}</p>
+              
               <div className="flex flex-col gap-3">
                 <div>
-                  <p className="text-sm font-medium mb-2">Color</p>
-                  <div className="flex items-center gap-2">
+                  {/*<p className="text-sm font-medium mb-2">Color</p>*/}
+                  <div className="flex items-center gap-2 mb-6">
                     {(() => {
                       const colorsRaw = producto?.color || '';
                       const colors = Array.isArray(colorsRaw)
@@ -288,7 +288,7 @@ export default function ProductoDetalle() {
                             key={i}
                             onClick={() => setSelectedColor(c)}
                             title={c}
-                            className={`w-8 h-8 rounded-full flex items-center justify-center border ${isSelected ? 'ring-2 ring-black' : 'border-gray-200'}`}
+                            className={`w-9 h-9 rounded-sm flex items-center justify-center cursor-pointer border-3 border-white bg-white shadow-[0_1px_3px_rgba(0,0,0,0.40)] ${isSelected ? 'shadow-[0_4px_8px_rgba(0,0,0,0.50)]' : ''} transition-all duration-200'}`}
                             style={{ backgroundColor: valid ? c : 'transparent' }}
                           >
                             {!valid && <span className="text-xs text-gray-700">{c}</span>}
@@ -299,9 +299,9 @@ export default function ProductoDetalle() {
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-sm font-medium mb-2">Talla</p>
-                  <div className="flex items-center gap-2">
+                <div className='mb-5'>
+                  <p className="text-sm font-medium mb-6">Talla:</p>
+                  <div className="flex items-center gap-3">
                     {(() => {
                       const sizesRaw = producto?.talla || '';
                       const sizes = Array.isArray(sizesRaw)
@@ -312,7 +312,7 @@ export default function ProductoDetalle() {
                         <button
                           key={idx}
                           onClick={() => setSelectedSize(s)}
-                          className={`px-3 py-1 border rounded text-sm ${selectedSize === s ? 'bg-black text-white' : 'bg-white text-gray-700'}`}
+                          className={`w-13 px-0 py-3 border rounded-none text-sm cursor-pointer transition-all duration-200 ${selectedSize === s ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-black hover:text-white'}`}
                         >
                           {s}
                         </button>
@@ -322,26 +322,25 @@ export default function ProductoDetalle() {
                 </div>
               </div>
 
-
-              <div className="mb-4">
-                <label className="block text-sm font-[Montserrat] mb-1">Cantidad:</label>
+              <div className="mb-10">
+                <label className="block text-sm font-medium mb-2">{/*Cantidad:*/}</label>
                 {producto.cantidad === 0 ? (
                   <p className="text-red-500 text-sm">Sin stock disponible</p>
                 ) : (
-                  <div className="flex items-center border rounded w-fit overflow-hidden">
+                  <div className="flex items-center border border-gray-300 w-fit overflow-hidden">
                     <button
                       type="button"
                       onClick={() => setCantidad(Math.max(1, cantidad - 1))}
-                      className="px-4 py-2 text-xl text-gray-600 hover:bg-gray-100"
+                      className="px-4 py-2 text-xl text-gray-600 hover:text-gray-400 cursor-pointer"
                       disabled={cantidad <= 1}
                     >
                       –
                     </button>
-                    <span className="px-6 py-2 text-center text-xl">{cantidad}</span>
+                    <span className="w-15 py-2 text-center text-sm font-medium">{cantidad}</span>
                     <button
                       type="button"
                       onClick={() => setCantidad(Math.min(producto.cantidad, cantidad + 1))}
-                      className="px-4 py-2 text-xl text-gray-600 hover:bg-gray-100"
+                      className="px-4 py-2 text-xl text-gray-600 hover:text-gray-400 cursor-pointer" 
                       disabled={cantidad >= producto.cantidad}
                     >
                       +
@@ -352,90 +351,172 @@ export default function ProductoDetalle() {
 
               <button
                 onClick={handleAgregarAlCarrito}
-                className="px-6 py-2 bg-black text-white rounded hover:opacity-80"
+                className="btn-animated w-full rounded"
                 disabled={producto.cantidad === 0}
               >
                 Agregar al carrito
               </button> 
-              {/* DESCRIPCIÓN */}
+                {/* Descripción */}
                 <div className="border-t pt-4">
                   <button
                     onClick={() => setMostrarDescripcion(!mostrarDescripcion)}
-                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg hover:underline"
+                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg"
                   >
                     Descripción
-                    <span className="text-xl">{mostrarDescripcion ? '▲' : '▼'}</span>
+
+                    {/* Ícono animado */}
+                    <span
+                      className={`transition-transform duration-300 ${
+                        mostrarDescripcion ? 'rotate-180' : 'rotate-0'
+                      }`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    </span>
                   </button>
 
-                  {mostrarDescripcion && (
-                    <div className="mt-2 text-gray-700 text-sm leading-relaxed space-y-4">
-                      {/* Descripción */}
+                  {/* Contenido con transición */}
+                  <div
+                    className={`
+                      overflow-hidden transition-all duration-300 
+                      ${mostrarDescripcion ? 'max-h-[1000px] opacity-100 mt-3' : 'max-h-0 opacity-0'}
+                    `}
+                  >
+                    <div className="text-gray-700 text-sm leading-relaxed space-y-4">
+
                       <div>
                         <p className="font-[Montserrat]">
                           {producto.descripcion || 'Descripción no disponible para este producto.'}
                         </p>
                       </div>
-                  
-                      {/* Información */}
+
                       <div>
                         <p className="font-[Montserrat]">
                           {producto.info || 'Información no disponible para este producto.'}
                         </p>
                       </div>
+
                     </div>
-                  )}
-                 </div>
+                  </div>
+                </div>
+                {/* Composición */}
                 <div className="border-t pt-4">
                   <button
                     onClick={() => setMostrarComposicion(!mostrarComposicion)}
-                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg hover:underline"
+                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg"
                   >
                     Composición
-                    <span className="text-xl">{mostrarComposicion ? '▲' : '▼'}</span>
+
+                    {/* Ícono animado */}
+                    <span
+                      className={`transition-transform duration-300 ${
+                        mostrarComposicion ? "rotate-180" : "rotate-0"
+                      }`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    </span>
                   </button>
 
-                  {mostrarComposicion && (
-                    <div className="mt-2 text-gray-700 text-sm leading-relaxed">
+                  {/* Contenido animado */}
+                  <div
+                    className={`
+                      overflow-hidden transition-all duration-300 
+                      ${mostrarComposicion ? "max-h-[1000px] opacity-100 mt-3" : "max-h-0 opacity-0"}
+                    `}
+                  >
+                    <div className="text-gray-700 text-sm leading-relaxed">
                       <p className="font-[Montserrat]">
-                        {producto.composicion || 'Composición no disponible para este producto.'}
+                        {producto.composicion || "Composición no disponible para este producto."}
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
                 {/* Cuidado */}
                 <div className="border-t pt-4">
                   <button
                     onClick={() => setMostrarCuidado(!mostrarCuidado)}
-                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg hover:underline"
+                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg"
                   >
                     Cuidado del producto
-                    <span className="text-xl">{mostrarCuidado ? '▲' : '▼'}</span>
+
+                    {/* Ícono animado */}
+                    <span
+                      className={`transition-transform duration-300 ${
+                        mostrarCuidado ? "rotate-180" : "rotate-0"
+                      }`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                        />
+                      </svg>
+                    </span>
                   </button>
 
-                  {mostrarCuidado && (
-                    <div className="mt-2 text-gray-700 text-sm leading-relaxed">
+                  {/* Contenido animado */}
+                  <div
+                    className={`
+                      overflow-hidden transition-all duration-300 
+                      ${mostrarCuidado ? "max-h-[1000px] opacity-100 mt-3" : "max-h-0 opacity-0"}
+                    `}
+                  >
+                    <div className="text-gray-700 text-sm leading-relaxed">
                       <p className="font-[Montserrat] whitespace-pre-line">
                         {producto.cuidados
                           ? producto.cuidados
-                              .split(' - ')
-                              .filter((item) => item.trim() !== '')
+                              .split(" - ")
+                              .filter((item) => item.trim() !== "")
                               .map((linea, index) => (
                                 <span key={index}>
                                   {linea.trim()}
                                   <br />
                                 </span>
                               ))
-                          : 'No se especificaron cuidados para este producto.'}
+                          : "No se especificaron cuidados para este producto."}
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
           </div>
 
           {/* Recomendaciones */}
           <div className="max-w-6xl mx-auto mt-16">
-            <h5 className="text-2xl mb-4 text-black">Te puede interesar</h5>
+            <h5 className="text-2xl font-medium text-center mb-10">TAMBIÉN PODRÍA GUSTARTE</h5>
             {loadingRec ? (
               <p>Cargando recomendaciones...</p>
             ) : (

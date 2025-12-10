@@ -160,7 +160,7 @@ export default function WomanContent() {
           }`}>
             {productosFiltrados.map(prod => (
               <Link key={prod.id} href={`/producto/${prod.id}`} className="group block">
-                <div className="bg-white border rounded-lg shadow hover:shadow-lg transition overflow-hidden">
+                <div className="bg-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                   <div className="relative w-full h-64 sm:h-72">
                     <Image
                       src={prod.imagen?.[0] || '/placeholder.jpg'}
@@ -188,8 +188,8 @@ export default function WomanContent() {
                   </div>
 
                   <div className="p-3 sm:p-4 text-center">
-                    <p className="text-sm font-medium text-gray-700 truncate">{prod.nombre}</p>
-                    <p className="text-base sm:text-lg font-normal text-black">S/ {prod.precio}</p>
+                    <p className="text-sm font-medium text-black truncate">{prod.nombre}</p>
+                    <p className="text-sm font-normal text-gray-500">S/ {prod.precio}</p>
                   </div>
                 </div>
               </Link>
