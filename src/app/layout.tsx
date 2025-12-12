@@ -8,7 +8,7 @@ import Analytics from './components/Analytics'; // ✅ RUTA CORRECTA
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideNavbarFooter = pathname.startsWith('/admin');
+  const hideNavbarFooter = pathname.startsWith('/admin') || pathname.startsWith('/employee');
 
   return (
     <html lang="es">

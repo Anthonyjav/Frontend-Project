@@ -71,7 +71,10 @@ export default function VistaOrdenes() {
         const ordenesData = await ordenesRes.json();
         const productosData = await productosRes.json();
 
-        setOrdenes(ordenesData);
+        setOrdenes(ordenesData.map((o: any) => ({
+          ...o,
+          total: typeof o.total === 'string' ? parseFloat(o.total) : Number(o.total || 0),
+        })));
         setProductos(productosData);
       } catch (error) {
         console.error('Error al obtener datos:', error);
@@ -360,7 +363,7 @@ export default function VistaOrdenes() {
                   {orden.nombre} {orden.apellido}
                 </td>
                 <td className="px-4 py-2 border border-black">
-                  PEN {orden.total.toFixed(2)}
+                  PEN {Number(orden.total ?? 0).toFixed(2)}
                 </td>
                 <td className="px-4 py-2 border border-black">
                   {editandoId === orden.id ? (
@@ -480,7 +483,7 @@ export default function VistaOrdenes() {
                   </td>
                   <td className="px-4 py-2 border border-black">{item.cantidad}</td>
                   <td className="px-4 py-2 border border-black">
-                    PEN {item.precio.toFixed(2)}
+                    PEN {Number(item.precio ?? 0).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -569,7 +572,7 @@ export default function VistaOrdenes() {
                     />
                   </td>
                   <td className="px-4 py-2 border border-black">
-                    PEN {item.precio.toFixed(2)}
+                    PEN {Number(item.precio ?? 0).toFixed(2)}
                   </td>
                   <td className="px-4 py-2 border border-black space-x-2">
                     <button
@@ -756,10 +759,10 @@ export default function VistaOrdenes() {
                         </td>
                         <td className="px-4 py-2 border text-center">{item.cantidad}</td>
                         <td className="px-4 py-2 border text-right">
-                          PEN {item.precio.toFixed(2)}
+                          PEN {Number(item.precio ?? 0).toFixed(2)}
                         </td>
                         <td className="px-4 py-2 border text-right font-semibold">
-                          PEN {(item.precio * item.cantidad).toFixed(2)}
+                          PEN {(Number(item.precio ?? 0) * Number(item.cantidad ?? 0)).toFixed(2)}
                         </td>
                       </tr>
                     ))

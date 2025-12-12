@@ -30,6 +30,10 @@ type Orden = {
   estado: string;
   total: number;
   createdAt: string;
+  orderId?: string;
+  orderIdIzipay?: string;
+  shippingMethod?: string;
+  paymentResponse?: any;
 };
 
 export default function PerfilUsuario() {
@@ -61,7 +65,13 @@ export default function PerfilUsuario() {
         const data = await res.json();
 
         // Filtrar órdenes del usuario
-        const ordenesUsuario = data.filter((orden: any) => orden.usuarioId === usuario.id);
+        const ordenesUsuario = data
+          .filter((orden: any) => orden.usuarioId === usuario.id)
+          .map((orden: any) => ({
+            ...orden,
+            total: typeof orden.total === 'string' ? parseFloat(orden.total) : Number(orden.total || 0),
+            createdAt: orden.createdAt || orden.created_at || orden.date || null,
+          }));
         setOrdenes(ordenesUsuario);
       } catch (err) {
         console.error(err);
@@ -177,8 +187,35 @@ export default function PerfilUsuario() {
       setShowRawOrder(false);
       const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${ordenId}`);
       if (!res.ok) throw new Error('Error al obtener detalle de la orden');
-      const data = await res.json();
+      let data = await res.json();
+      // Normalizar paymentResponse si viene como string
+      try {
+        if (data.paymentResponse && typeof data.paymentResponse === 'string') {
+          try {
+            data.paymentResponse = JSON.parse(data.paymentResponse);
+          } catch (e) {
+            // limpiar comillas escapadas y reintentar
+            const cleaned = data.paymentResponse.replace(/\\"/g, '"');
+            data.paymentResponse = JSON.parse(cleaned);
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      // Normalizar orderId y shippingMethod si vienen en paymentResponse metadata
+      try {
+        const resp = data.paymentResponse && typeof data.paymentResponse === 'string' ? (() => { try { return JSON.parse(data.paymentResponse); } catch { return data.paymentResponse; } })() : (data.paymentResponse || {});
+        const meta = resp?.transactions?.[0]?.metadata || resp?.metadata || {};
+        data.orderId = data.orderId || data.orderIdIzipay || meta?.orderId || meta?.order_id || resp.orderId || resp.order_id || data.orderId;
+        data.shippingMethod = data.shippingMethod || meta?.shippingMethod || meta?.metodoEnvio || resp.shippingMethod || data.shippingMethod || null;
+      } catch (e) {
+        // ignore
+      }
       console.log('DETALLE ORDEN RAW', data);
+      // Normalize a few commonly used fields
+      data.total = typeof data.total === 'string' ? parseFloat(data.total) : Number(data.total || 0);
+      data.createdAt = data.createdAt || data.created_at || data.date || null;
       setOrderDetails(data);
       setShowOrderModal(true);
     } catch (err) {
@@ -191,11 +228,14 @@ export default function PerfilUsuario() {
 
   const extractPaymentMethod = (d: any) => {
     if (!d) return 'N/D';
+    const resp = d.paymentResponse && typeof d.paymentResponse === 'string'
+      ? (() => { try { return JSON.parse(d.paymentResponse); } catch { return d.paymentResponse; } })()
+      : (d.paymentResponse || d);
     return (
       d.paymentMethod ||
-      d.paymentResponse?.paymentMethod ||
-      d.transactions?.[0]?.paymentMethod ||
-      d.paymentResponse?.method ||
+      resp?.paymentMethod ||
+      resp?.transactions?.[0]?.paymentMethod ||
+      resp?.method ||
       (d.metadata && (d.metadata.paymentMethod || d.metadata.method)) ||
       'N/D'
     );
@@ -203,25 +243,31 @@ export default function PerfilUsuario() {
 
   const getPaymentInfo = (d: any) => {
     if (!d) return { label: 'N/D' };
-    const tx = d.paymentResponse?.transactions?.[0] || d.transactions?.[0] || null;
+    const resp = d.paymentResponse && typeof d.paymentResponse === 'string'
+      ? (() => { try { return JSON.parse(d.paymentResponse); } catch { return d.paymentResponse; } })()
+      : (d.paymentResponse || d);
+    const tx = resp?.transactions?.[0] || d.transactions?.[0] || null;
     const brand = tx?.transactionDetails?.cardDetails?.effectiveBrand || tx?.transactionDetails?.paymentMethodDetails?.effectiveBrand || d.paymentResponse?.card?.brand || d.paymentResponse?.paymentMethod || null;
     // try to find last4
-    const pan = tx?.transactionDetails?.cardDetails?.cardHolderPan || d.paymentResponse?.card?.last4 || d.paymentResponse?.card?.last_digits || null;
+    const pan = tx?.transactionDetails?.cardDetails?.cardHolderPan || resp?.card?.last4 || resp?.card?.last_digits || null;
     const last = pan ? String(pan).slice(-4) : null;
-    const type = tx?.paymentMethodType || tx?.paymentMethod || d.paymentResponse?.paymentMethodType || d.paymentMethodType || null;
+    const type = tx?.paymentMethodType || tx?.paymentMethod || resp?.paymentMethodType || d.paymentMethodType || null;
     const label = brand ? `${brand}${last ? ' • ****' + last : ''}` : (type || extractPaymentMethod(d) || 'N/D');
     return { brand, last, type, label };
   };
 
   const extractShippingMethod = (d: any) => {
     if (!d) return 'N/D';
+    const resp = d.paymentResponse && typeof d.paymentResponse === 'string'
+      ? (() => { try { return JSON.parse(d.paymentResponse); } catch { return d.paymentResponse; } })()
+      : (d.paymentResponse || d);
     return (
       d.metodoEnvio ||
       d.shippingMethod ||
       d.shipping?.method ||
-      d.paymentResponse?.transactions?.[0]?.metadata?.metodoEnvio ||
-      d.paymentResponse?.transactions?.[0]?.metadata?.shippingMethod ||
-      d.paymentResponse?.customer?.shippingDetails?.shippingMethod ||
+      resp?.transactions?.[0]?.metadata?.metodoEnvio ||
+      resp?.transactions?.[0]?.metadata?.shippingMethod ||
+      resp?.customer?.shippingDetails?.shippingMethod ||
       (d.metadata && (d.metadata.metodoEnvio || d.metadata.shippingMethod)) ||
       'N/D'
     );
@@ -230,8 +276,11 @@ export default function PerfilUsuario() {
   // Devuelve un objeto con campos de envío normalizados: metodoEnvio, referencia, distrito, direccion, telefono
   const getShippingInfo = (d: any) => {
     if (!d) return {};
-    const metaTx = d.paymentResponse?.transactions?.[0]?.metadata || (d.transactions && d.transactions[0] && d.transactions[0].metadata) || {};
-    const customerShip = d.paymentResponse?.customer?.shippingDetails || d.customer?.shippingDetails || {};
+    const resp = d.paymentResponse && typeof d.paymentResponse === 'string'
+      ? (() => { try { return JSON.parse(d.paymentResponse); } catch { return d.paymentResponse; } })()
+      : (d.paymentResponse || d);
+    const metaTx = resp?.transactions?.[0]?.metadata || (d.transactions && d.transactions[0] && d.transactions[0].metadata) || {};
+    const customerShip = resp?.customer?.shippingDetails || d.customer?.shippingDetails || {};
 
     const metodoEnvio = d.metodoEnvio || d.shippingMethod || metaTx.metodoEnvio || metaTx.shippingMethod || customerShip.shippingMethod || (d.metadata && (d.metadata.metodoEnvio || d.metadata.shippingMethod)) || null;
     const referencia = d.referencia || metaTx.referencia || customerShip.reference || d.reference || (d.metadata && d.metadata.referencia) || null;
@@ -322,7 +371,17 @@ export default function PerfilUsuario() {
 
   const parseMetadataItems = (order: any) => {
     try {
-      const txMeta = order?.paymentResponse?.transactions?.[0]?.metadata;
+      // Normalize paymentResponse structure and try several places for metadata
+      let transSource: any = null;
+      if (order?.paymentResponse) {
+        try {
+          const resp = typeof order.paymentResponse === 'string' ? JSON.parse(order.paymentResponse) : order.paymentResponse;
+          transSource = resp?.transactions?.[0]?.metadata || resp?.metadata || null;
+        } catch (e) {
+          transSource = order.paymentResponse?.transactions?.[0]?.metadata || order.paymentResponse?.metadata || null;
+        }
+      }
+      const txMeta = transSource || order?.transactions?.[0]?.metadata || order?.metadata;
       if (!txMeta) return [];
       const rawItems = txMeta.items;
       if (!rawItems) return [];
@@ -349,7 +408,7 @@ export default function PerfilUsuario() {
 
   const getItemImage = (it: any) => {
     // 1) si el item trae imagen directa
-    if (it.imagen) return it.imagen;
+    if (it.imagen) return Array.isArray(it.imagen) ? it.imagen[0] : it.imagen;
     if (it.producto && it.producto.imagen && it.producto.imagen[0]) return it.producto.imagen[0];
 
     // 2) intentar extraer desde orderDetails.paymentResponse.transactions[0].metadata.items
@@ -358,7 +417,8 @@ export default function PerfilUsuario() {
       const found = metaItems.find((mi: any) => String(mi.productoId || mi.producto_id || mi.id) === String(it.productoId || it.producto?.id || it.productoId));
       if (found) {
         // varios nombres posibles: imagen, image, imagenUrl
-        return found.imagen || found.image || found.imagenUrl || found.imageUrl || null;
+        const f = found.imagen || found.image || found.imagenUrl || found.imageUrl || null;
+        return Array.isArray(f) ? f[0] : f;
       }
     }
 
@@ -513,8 +573,8 @@ export default function PerfilUsuario() {
               </button>
             </div>
 
-             <p className="text-sm text-gray-600">Orden #{index + 1}</p>
-             <p className="text-lg font-semibold">Total: PEN {orden.total.toFixed(2)}</p>
+             <p className="text-sm text-gray-600">Orden {orden.orderId ? orden.orderId : `#${index + 1}`}</p>
+             <p className="text-lg font-semibold">Total: PEN {Number(orden.total ?? 0).toFixed(2)}</p>
              <p className="text-sm text-gray-500">
                Estado: <span className="font-medium">{orden.estado}</span>
              </p>
@@ -647,7 +707,11 @@ export default function PerfilUsuario() {
           <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 mx-4 overflow-auto max-h-[80vh]">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-lg font-semibold">Detalle Orden #{orderDetails.id || orderDetails.orderId || '—'}</h3>
+                <h3 className="text-lg font-semibold">
+                  {orderDetails.orderId || orderDetails.orderIdIzipay
+                    ? `Detalle Orden ${orderDetails.orderId || orderDetails.orderIdIzipay}`
+                    : `Detalle Orden #${orderDetails.id || '—'}`}
+                </h3>
                 <p className="text-sm text-gray-600">Estado: <span className="font-medium">{orderDetails.estado || orderDetails.status || 'N/D'}</span></p>
                 <p className="text-sm text-gray-600">Total: PEN {Number(orderDetails.total || orderDetails.amount || 0).toFixed(2)}</p>
                 <p className="text-sm text-gray-500">Fecha: {orderDetails.createdAt ? new Date(orderDetails.createdAt).toLocaleString() : (orderDetails.date ? new Date(orderDetails.date).toLocaleString() : 'N/D')}</p>
@@ -682,7 +746,7 @@ export default function PerfilUsuario() {
                   const s = getShippingInfo(orderDetails);
                   return (
                     <div>
-                      <p className="text-sm text-gray-700">{s.metodoEnvio || 'N/D'}</p>
+                      <p className="text-sm text-gray-700">{s.metodoEnvio || orderDetails.shippingMethod || orderDetails.metodoEnvio || 'N/D'}</p>
                       <div className="mt-2 text-sm text-gray-600">
                         {s.direccion && <p>{s.direccion}</p>}
                         {(s.direccion || s.distrito) && <p>{s.distrito ? `Distrito: ${s.distrito}` : null}</p>}

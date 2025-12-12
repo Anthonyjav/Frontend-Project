@@ -20,27 +20,35 @@ import {
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
+// Tipos
+type OrdenItem = { id: number; productoId: number; cantidad: number; };
+type Producto = { id: number; nombre: string; categoriaId?: number; };
+type VentaPorDia = { fecha: string; ordenes: number; total: number; };
+type UsuarioPorMes = { mes: string; cantidad: number; };
+type ProductoVendido = { nombreProducto: string; cantidad: number; };
+type CategoriaResumen = { nombre: string; cantidad: number; };
+
 export default function DashboardGraficos() {
-  const [productosVendidos, setProductosVendidos] = useState([]);
-  const [ordenesPorDia, setOrdenesPorDia] = useState([]);
-  const [ingresosPorDia, setIngresosPorDia] = useState([]);
-  const [usuariosPorMes, setUsuariosPorMes] = useState([]);
-  const [categorias, setCategorias] = useState([]);
+  const [productosVendidos, setProductosVendidos] = useState<ProductoVendido[]>([]);
+  const [ordenesPorDia, setOrdenesPorDia] = useState<VentaPorDia[]>([]);
+  const [ingresosPorDia, setIngresosPorDia] = useState<VentaPorDia[]>([]);
+  const [usuariosPorMes, setUsuariosPorMes] = useState<UsuarioPorMes[]>([]);
+  const [categorias, setCategorias] = useState<CategoriaResumen[]>([]);
 
   useEffect(() => {
     // Productos más vendidos
     Promise.all([
       fetch('https://backend-project-v2.onrender.com/orden-items').then(res => res.json()),
       fetch('https://backend-project-v2.onrender.com/productos').then(res => res.json()),
-    ]).then(([ordenItems, productos]) => {
-      const mapaNombres = productos.reduce((acc, prod) => {
+    ]).then(([ordenItems, productos]: [OrdenItem[], Producto[]]) => {
+      const mapaNombres = productos.reduce<Record<number, string>>((acc, prod: Producto) => {
         acc[prod.id] = prod.nombre;
         return acc;
       }, {});
 
-      const resumen = ordenItems.reduce((acc, item) => {
+      const resumen = ordenItems.reduce<ProductoVendido[]>((acc, item: OrdenItem) => {
         const nombre = mapaNombres[item.productoId] || `Producto ${item.productoId}`;
-        const existente = acc.find(p => p.nombreProducto === nombre);
+        const existente = acc.find((p) => p.nombreProducto === nombre);
         if (existente) {
           existente.cantidad += item.cantidad;
         } else {
@@ -55,15 +63,15 @@ export default function DashboardGraficos() {
     // Órdenes e ingresos por día
     fetch('https://backend-project-v2.onrender.com/ordenes')
       .then(res => res.json())
-      .then(ordenes => {
-        const agrupado = ordenes.reduce((acc, orden) => {
+        .then((ordenes: any[]) => {
+        const agrupado = ordenes.reduce<VentaPorDia[]>((acc, orden: any) => {
           const fecha = new Date(orden.createdAt).toISOString().split('T')[0];
-          const existente = acc.find(item => item.fecha === fecha);
+          const existente = acc.find((item) => item.fecha === fecha);
           if (existente) {
             existente.ordenes++;
-            existente.total += orden.total;
+            existente.total += Number(orden.total || 0);
           } else {
-            acc.push({ fecha, ordenes: 1, total: orden.total });
+            acc.push({ fecha, ordenes: 1, total: Number(orden.total || 0) });
           }
           return acc;
         }, []);
@@ -74,11 +82,11 @@ export default function DashboardGraficos() {
     // Usuarios por mes
     fetch('https://backend-project-v2.onrender.com/usuarios')
       .then(res => res.json())
-      .then(usuarios => {
-        const agrupado = usuarios.reduce((acc, u) => {
+      .then((usuarios: any[]) => {
+        const agrupado = usuarios.reduce<UsuarioPorMes[]>((acc, u: any) => {
           const fecha = new Date(u.createdAt);
           const key = `${fecha.getFullYear()}-${fecha.getMonth() + 1}`;
-          const existente = acc.find(i => i.mes === key);
+          const existente = acc.find((i) => i.mes === key);
           if (existente) {
             existente.cantidad++;
           } else {
@@ -93,10 +101,10 @@ export default function DashboardGraficos() {
     Promise.all([
       fetch('https://backend-project-v2.onrender.com/productos').then(res => res.json()),
       fetch('https://backend-project-v2.onrender.com/categorias').then(res => res.json())
-    ]).then(([productos, categorias]) => {
-      const resumen = categorias.map(cat => {
-        const cantidad = productos.filter(p => p.categoriaId === cat.id).length;
-        return { nombre: cat.nombre, cantidad };
+    ]).then(([productos, categorias]: [Producto[], any[]]) => {
+      const resumen = categorias.map((cat: any) => {
+        const cantidad = productos.filter((p) => p.categoriaId === cat.id).length;
+        return { nombre: cat.nombre, cantidad } as CategoriaResumen;
       });
       setCategorias(resumen);
     });
@@ -174,7 +182,7 @@ export default function DashboardGraficos() {
   );
 }
 
-function Card({ titulo, children }) {
+function Card({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">
       <h2 className="text-xl font-bold mb-4">{titulo}</h2>

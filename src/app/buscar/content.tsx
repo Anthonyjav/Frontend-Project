@@ -104,7 +104,7 @@ export default function BuscarContent() {
               </div>
               <div className="p-4 text-center">
                 <h2 className="text-gray-800 font-semibold truncate">{p.nombre}</h2>
-                <p className="text-black font-bold mt-1">PEN {p.precio.toFixed(2)}</p>
+                <p className="text-black font-bold mt-1">PEN {Number(p.precio ?? 0).toFixed(2)}</p>
               </div>
             </Link>
           ))}

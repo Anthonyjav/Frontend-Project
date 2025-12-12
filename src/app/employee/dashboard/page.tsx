@@ -8,6 +8,8 @@ import EmployeeSidebar from "@/app/employee/dashboard/sidebarEmployee";
 import CrearCategoriaForm from "@/app/admin/dashboard/components/CrearCategoriaForm";
 import CrearProductoForm from "@/app/admin/dashboard/components/CrearProductoForm";
 import VistaOrdenes from "@/app/admin/dashboard/components/VistaOrdenes";
+import ResumenEmpleado from './components/ResumenEmpleado';
+import ListarProductosEmployee from './components/ListarProductosEmployee';
 
 export default function EmployeeDashboard() {
   const router = useRouter();
@@ -39,9 +41,8 @@ export default function EmployeeDashboard() {
       <EmployeeSidebar onSelect={setVista} onLogout={handleLogout} />
 
       <main className="flex-grow p-8 max-w-6xl mx-auto">
-        
         {vista === "dashboard" && (
-          <h1 className="text-2xl font-bold">Bienvenido Empleado</h1>
+          <ResumenEmpleado />
         )}
 
         {vista === "categorias" && (
@@ -52,9 +53,20 @@ export default function EmployeeDashboard() {
         )}
 
         {vista === "productos" && (
-          <div className="bg-white p-6 rounded-xl shadow border max-w-lg">
-            <h2 className="text-xl font-semibold mb-2"></h2>
-            <CrearProductoForm />
+          <div className="mt-4">
+            <div className="bg-white p-6 rounded-xl shadow border">
+              <h2 className="text-2xl font-semibold mb-4">Productos</h2>
+              <ListarProductosEmployee />
+            </div>
+          </div>
+        )}
+
+        {vista === "crear-producto" && (
+          <div className="mt-4">
+            <div className="bg-white p-6 rounded-xl shadow border">
+                <h2 className="text-2xl font-semibold mb-4">Crear Producto</h2>
+              <CrearProductoForm />
+            </div>
           </div>
         )}
 

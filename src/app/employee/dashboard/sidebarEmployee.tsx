@@ -16,9 +16,11 @@ export default function SidebarEmployee({
         <h1 className="text-3xl font-extrabold mb-8 text-center">Panel Empleado</h1>
         <nav className="flex flex-col gap-3">
           {[
+            { label: 'Dashboard', icon: Package, view: 'dashboard' },
             { label: 'Categorías', icon: Tags, view: 'categorias' },
-            { label: 'Crear Producto', icon: PlusCircle, view: 'productos' },
-            { label: 'Órdenes', icon: Package, view: 'ordenes' }, 
+            { label: 'Crear Producto', icon: PlusCircle, view: 'crear-producto' },
+            { label: 'Ver Productos', icon: LayoutList, view: 'productos' },
+            { label: 'Órdenes', icon: Package, view: 'ordenes' },
           ].map(({ label, icon: Icon, view }) => (
             <button
               key={view}

@@ -28,7 +28,12 @@ export default function VentasView() {
     (async () => {
       try {
         const { data } = await axios.get<Orden[]>('https://backend-project-v2.onrender.com/ordenes');
-        setOrdenes(data);
+        // Normalize totals in case backend returns strings
+        const normalized = data.map((o: any) => ({
+          ...o,
+          total: typeof o.total === 'string' ? parseFloat(o.total) : Number(o.total || 0),
+        }));
+        setOrdenes(normalized as Orden[]);
       } catch (e) {
         setError('No se pudieron cargar las ventas 😓');
       } finally {
@@ -39,7 +44,7 @@ export default function VentasView() {
 
   /* ---------- derivados ---------- */
   const totalVentas = useMemo(
-    () => ordenes.reduce((s, o) => s + o.total, 0),
+    () => ordenes.reduce((s, o) => s + Number(o.total || 0), 0),
     [ordenes]
   );
  

@@ -28,6 +28,14 @@ type ProductoCarrito = {
   };
 };
 
+type Producto = {
+  id: number;
+  nombre: string;
+  categoria?: Categoria | null;
+  imagen?: string[];
+  precio?: number;
+};
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -36,7 +44,7 @@ export default function Navbar() {
   const [showCart, setShowCart] = useState(false);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [carrito, setCarrito] = useState<ProductoCarrito[]>([]);
-  const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState([]);
+  const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<Categoria[]>([]);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [submenuAbierto, setSubmenuAbierto] = useState<'woman' | 'new' | ''>('');
   const [isHoveringWoman, setIsHoveringWoman] = useState(false);
@@ -76,13 +84,14 @@ export default function Navbar() {
         const res = await fetch('https://backend-project-v2.onrender.com/productos/seleccionados');
         const data: Producto[] = await res.json();
       
-        const categoriasFiltradas = data
+        const categoriaCandidates = data
           .map((p) => p.categoria)
-          .filter((cat, i, self) =>
-            cat && self.findIndex((c) => c.id === cat.id) === i
-          )
-          .slice(0, 4); // limitar a 4 categorías
-        
+          .filter((c): c is Categoria => c != null);
+
+        const categoriasFiltradas = categoriaCandidates.filter((cat, i, self) =>
+          self.findIndex((c) => c.id === cat.id) === i
+        ).slice(0, 4);
+
         setCategoriasSeleccionadas(categoriasFiltradas);
       } catch (err) {
         console.error('Error cargando categorías seleccionadas', err);
@@ -198,12 +207,14 @@ export default function Navbar() {
 
 
   const handleUserClick = () => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const role = localStorage.getItem('role')?.toLowerCase();
-    
-    if (isLoggedIn === 'true') {
+
+    if (isLoggedIn) {
       if (role === 'admin') {
         router.push('/admin/dashboard');
+      } else if (role === 'employee' || role === 'empleado') {
+        router.push('/employee/dashboard');
       } else {
         router.push('/usuario/perfil');
       }
