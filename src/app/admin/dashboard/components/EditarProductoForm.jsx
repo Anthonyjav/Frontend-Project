@@ -41,37 +41,36 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const data = new FormData();
+  const data = new FormData();
     data.append('nombre', formData.nombre);
     data.append('precio', formData.precio);
     data.append('descripcion', formData.descripcion);
 
-    // Enviar las URLs de las imágenes que se conservaron
-    formData.imagen.forEach((url) => {
-      data.append('imagenesActuales', url);
-    });
-
-    // Enviar nuevas imágenes (archivos)
-    nuevasImagenes.forEach((img) => {
-      data.append('nuevasImagenes', img);
-    });
+    formData.imagen.forEach((url) => data.append('imagenesActuales', url));
+    nuevasImagenes.forEach((img) => data.append('nuevasImagenes', img));
 
     try {
+      const token = localStorage.getItem('token'); 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos/${producto.id}`, {
         method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
         body: data,
       });
 
       if (!res.ok) throw new Error('Error al actualizar producto');
 
       alert('Producto actualizado exitosamente');
-      onGuardado(); // Notifica al padre para refrescar lista o cerrar modal
+      onGuardado(); 
     } catch (error) {
       alert(error.message);
     }
   };
+
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow">

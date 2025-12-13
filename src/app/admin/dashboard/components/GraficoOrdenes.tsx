@@ -97,7 +97,6 @@ export default function DashboardGraficos() {
         setUsuariosPorMes(agrupado);
       });
 
-    // Productos por categoría
     Promise.all([
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`).then(res => res.json()),
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias`).then(res => res.json())

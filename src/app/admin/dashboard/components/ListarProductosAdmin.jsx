@@ -55,8 +55,12 @@ export default function ListarProductosAdmin() {
     if (!confirm('¿Seguro que quieres eliminar este producto?')) return;
     setEliminando(id);
     try {
+      const token = localStorage.getItem('token'); 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos/${id}`, {
         method: 'DELETE',
+        headers: {
+        Authorization: `Bearer ${token}`, 
+      },
       });
       if (!res.ok) throw new Error('Error al eliminar producto');
       setProductos((prev) => prev.filter((p) => p.id !== id));
@@ -105,9 +109,12 @@ export default function ListarProductosAdmin() {
         if (v !== null && v !== undefined) formData.append(k, v);
       });
       nuevaImagenes.forEach((file) => formData.append('imagenes', file));
+      const token = localStorage.getItem('token');
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/productos/${productoEditando.id}`,
-        { method: 'PUT', body: formData }
+        { method: 'PUT',headers: {
+          Authorization: `Bearer ${token}`,
+        }, body: formData }
       );
       if (!res.ok) throw new Error('Error al guardar el producto');
       const actualizado = await res.json();

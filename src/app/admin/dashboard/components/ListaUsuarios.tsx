@@ -43,15 +43,33 @@ export default function ListarUsuarios() {
 
   const actualizarUsuario = async (usuario: Usuario) => {
     try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        alert('No estás autenticado');
+        return;
+      }
+
       const body = {
         rol: usuario.rol,
       };
 
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios/${usuario.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/usuarios/${usuario.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // 🔑 CLAVE
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Error al actualizar');
+      }
 
       setEditandoId(null);
     } catch (error) {
@@ -60,22 +78,26 @@ export default function ListarUsuarios() {
   };
 
 
+
   const eliminarUsuario = async (id: number) => {
     if (!confirm('¿Eliminar este usuario?')) return;
 
     try {
+      const token = localStorage.getItem('token');
+
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios/${id}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       setUsuarios((prev) => prev.filter((u) => u.id !== id));
     } catch (error) {
       console.error('Error al eliminar usuario:', error);
     }
   };
 
-  if (loading) {
-    return <p className="text-center text-gray-600">Cargando usuarios...</p>;
-  }
 
   return (
     <div className="p-6">

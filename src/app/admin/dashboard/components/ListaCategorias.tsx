@@ -12,8 +12,8 @@ export default function ListaCategorias() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [eliminandoId, setEliminandoId] = useState<number | null>(null);
 
-  /* ──────────────── cargar categorías ──────────────── */
   useEffect(() => {
+    
     const fetchCategorias = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias`);
@@ -35,9 +35,13 @@ export default function ListaCategorias() {
     setEliminandoId(id);
 
     try {
+        const token = localStorage.getItem('token'); 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/categorias/${id}`,
-        { method: 'DELETE' }
+        { method: 'DELETE',
+          headers: {Authorization: `Bearer ${token}`,
+          },
+         }
       );
 
       if (!res.ok) {
