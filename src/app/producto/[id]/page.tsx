@@ -515,22 +515,22 @@ export default function ProductoDetalle() {
           </div>
 
           {/* Recomendaciones */}
-          <div className="max-w-6xl mx-auto mt-16">
-            <h5 className="text-2xl font-medium text-center mb-10">TAMBIÉN PODRÍA GUSTARTE</h5>
+          <div className="max-w-6xl mx-auto mt-30">
+            <h5 className="text-2xl font-medium text-center mb-10 justify-center">TAMBIÉN PODRÍA GUSTARTE</h5>
             {loadingRec ? (
               <p>Cargando recomendaciones...</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-10">
                 {recomendados.map((item: any) => (
                   <div
                     key={item.id}
-                    className="cursor-pointer hover:shadow-lg transition p-4 border rounded relative"
+                    className="bg-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                     onClick={() => {
                       setIdActual(String(item.id));
                       router.push(`/producto/${item.id}`);
                     }}
                   >
-                    <div className="w-full h-48 relative">
+                    <div className="w-full h-70 relative">
                       {item.imagen?.[0] && (
                         <Image
                           src={item.imagen[0]}
@@ -549,8 +549,10 @@ export default function ProductoDetalle() {
                         </div>
                       )}
                     </div>
-                    <h3 className="mt-2 text-black font-medium truncate">{item.nombre}</h3>
-                    <p className="font-['Montserrat'] text-sm text-black">PEN {item.precio}</p>
+                    <div className="p-3 sm:p-4 text-center">
+                      <h3 className="mt-2 text-black font-medium truncate">{item.nombre}</h3>
+                      <p className="text-sm font-normal text-gray-500">S/ {item.precio}</p>
+                    </div>
                   </div>
                 ))}
               </div>
