@@ -21,7 +21,7 @@ export default function ListarUsuarios() {
 
   const obtenerUsuarios = async () => {
     try {
-      const res = await fetch('https://backend-project-v2.onrender.com/usuarios');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios`);
       const data = await res.json();
       setUsuarios(data);
     } catch (error) {
@@ -47,7 +47,7 @@ export default function ListarUsuarios() {
         rol: usuario.rol,
       };
 
-      await fetch(`https://backend-project-v2.onrender.com/usuarios/${usuario.id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios/${usuario.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -64,7 +64,7 @@ export default function ListarUsuarios() {
     if (!confirm('¿Eliminar este usuario?')) return;
 
     try {
-      await fetch(`https://backend-project-v2.onrender.com/usuarios/${id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios/${id}`, {
         method: 'DELETE',
       });
       setUsuarios((prev) => prev.filter((u) => u.id !== id));

@@ -13,20 +13,20 @@ export default function ResumenDashboard() {
 
 
   useEffect(() => {
-    fetch('https://backend-project-v2.onrender.com/productos')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`)
       .then(res => res.json())
       .then(data => setProductos(data.length));
 
-    fetch('https://backend-project-v2.onrender.com/categorias')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias`)
       .then(res => res.json())
       .then(data => setCategorias(data.length));
 
-    fetch('https://backend-project-v2.onrender.com/usuarios')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios`)
       .then(res => res.json())
       .then(data => setCantidadUsuarios(data.length))
       .catch(err => console.error('Error al obtener usuarios:', err));
 
-    fetch('https://backend-project-v2.onrender.com/reclamos')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/reclamos`)
       .then(res => res.json())
       .then(data => setCantidadReclamos(data.length))
       .catch(err => console.error('Error al obtener reclamos:', err));

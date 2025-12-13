@@ -10,17 +10,17 @@ export default function ResumenEmpleado() {
   const [ordenes, setOrdenes] = useState(0);
 
   useEffect(() => {
-    fetch('https://backend-project-v2.onrender.com/productos')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`)
       .then(res => res.json())
       .then(data => setProductos(Array.isArray(data) ? data.length : 0))
       .catch(() => setProductos(0));
 
-    fetch('https://backend-project-v2.onrender.com/categorias')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias`)
       .then(res => res.json())
       .then(data => setCategorias(Array.isArray(data) ? data.length : 0))
       .catch(() => setCategorias(0));
 
-    fetch('https://backend-project-v2.onrender.com/ordenes')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes`)
       .then(res => res.json())
       .then(data => setOrdenes(Array.isArray(data) ? data.length : 0))
       .catch(() => setOrdenes(0));

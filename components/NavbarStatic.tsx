@@ -68,7 +68,10 @@ export default function Navbar() {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const response = await fetch('https://backend-project-v2.onrender.com/categorias');
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/categorias`
+        );
+
         const data = await response.json();
         setCategorias(data);
       } catch (error) {
@@ -81,8 +84,10 @@ export default function Navbar() {
   useEffect(() => {
     const fetchCategoriasSeleccionadas = async () => {
       try {
-        const res = await fetch('https://backend-project-v2.onrender.com/productos/seleccionados');
-        const data: Producto[] = await res.json();
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/productos/seleccionados`
+        );
+        const data: Producto[] = await response.json();
       
         const categoriaCandidates = data
           .map((p) => p.categoria)
@@ -121,7 +126,7 @@ export default function Navbar() {
       if (isLoggedIn && storedUser) {
         const user = JSON.parse(storedUser);
         try {
-          const response = await fetch(`https://backend-project-v2.onrender.com/carrito/${user.id}`);
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/carrito/${user.id}`);
           if (!response.ok) throw new Error('No se pudo obtener el carrito');
           const data = await response.json();
 
@@ -151,10 +156,14 @@ export default function Navbar() {
   useEffect(() => {
     const fetchCategoriasConProductos = async () => {
       try {
-        const resCat = await fetch('https://backend-project-v2.onrender.com/categorias');
+        const resCat = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/categorias`
+        );
         const categoriasData = await resCat.json();
 
-        const resProd = await fetch('https://backend-project-v2.onrender.com/productos');
+        const resProd = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/productos`
+        );
         const productosData: Producto[] = await resProd.json();
 
         const categoriasConProductos = categoriasData.filter((cat: Categoria) =>
@@ -251,7 +260,7 @@ export default function Navbar() {
       try {
         const user = JSON.parse(storedUser);
         const response = await fetch(
-          `https://backend-project-v2.onrender.com/carritoItem/${itemId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/carritoItem/${itemId}`,
           {
             method: 'DELETE',
           }

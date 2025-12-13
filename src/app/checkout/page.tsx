@@ -47,7 +47,7 @@ export default function CheckoutPage() {
         const user = JSON.parse(storedUser);
         try {
           const response = await fetch(
-            `https://backend-project-v2.onrender.com/carrito/${user.id}`
+            `${process.env.NEXT_PUBLIC_API_URL}/carrito/${user.id}`
           );
           const data = await response.json();
           setCarrito(data);
@@ -221,10 +221,13 @@ export default function CheckoutPage() {
       // Log temporal para depuración: ver exactamente lo que enviamos
       console.log("[IziPay] bodyIzipay ->", bodyIzipay);
       const res = await axios.post(
-        "https://backend-project-v2.onrender.com/api/izipay/form-token",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/izipay/form-token`,
         bodyIzipay,
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
+
 
       console.log("🔹 Respuesta del backend:", res.data);
 
@@ -283,7 +286,8 @@ useEffect(() => {
   // kr-post-url-success: cuando el pago es EXITOSO
   container.setAttribute(
     "kr-post-url-success",
-    "https://backend-project-v2.onrender.com/api/izipay/pago-exitoso"
+    `${process.env.NEXT_PUBLIC_API_URL}/api/izipay/pago-exitoso`
+
   );
   
   // kr-post-url-refused: cuando el pago es RECHAZADO/FALLIDO

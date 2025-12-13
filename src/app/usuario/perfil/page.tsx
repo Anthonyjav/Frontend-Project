@@ -61,7 +61,7 @@ export default function PerfilUsuario() {
     async function fetchOrdenes() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://backend-project-v2.onrender.com/ordenes`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes`);
         const data = await res.json();
 
         // Filtrar órdenes del usuario
@@ -85,7 +85,7 @@ export default function PerfilUsuario() {
     async function fetchReclamos() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://backend-project-v2.onrender.com/reclamos`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reclamos`);
         const data = await res.json();
         const reclamosUsuario = data.filter((r: any) => r.usuarioId === usuario.id);
         setReclamos(reclamosUsuario);
@@ -114,7 +114,7 @@ export default function PerfilUsuario() {
     async function fetchCarrito() {
       if (!usuario?.id) return;
       try {
-        const res = await fetch(`https://backend-project-v2.onrender.com/carrito/${usuario.id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/carrito/${usuario.id}`);
         const data = await res.json();
         setCarrito(data.items);
       } catch (err) {
@@ -145,7 +145,7 @@ export default function PerfilUsuario() {
 
   const handleEliminarItem = async (itemId: number) => {
   try {
-    await fetch(`https://backend-project-v2.onrender.com/carrito/item/${itemId}`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/carrito/item/${itemId}`, {
       method: 'DELETE',
     });
 
@@ -165,7 +165,7 @@ export default function PerfilUsuario() {
     if (!confirmacion) return;
 
     try {
-      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${ordenId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${ordenId}`, {
         method: 'DELETE',
       });
 
@@ -185,7 +185,7 @@ export default function PerfilUsuario() {
     try {
       setLoadingOrderDetails(true);
       setShowRawOrder(false);
-      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${ordenId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${ordenId}`);
       if (!res.ok) throw new Error('Error al obtener detalle de la orden');
       let data = await res.json();
       // Normalizar paymentResponse si viene como string
@@ -664,7 +664,7 @@ export default function PerfilUsuario() {
                   }
 
                   try {
-                    const res = await fetch('https://backend-project-v2.onrender.com/reclamos', {
+                    const res = await fetch('${process.env.NEXT_PUBLIC_API_URL}/reclamos', {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',

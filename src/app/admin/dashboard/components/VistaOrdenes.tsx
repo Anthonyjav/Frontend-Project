@@ -64,8 +64,8 @@ export default function VistaOrdenes() {
     async function fetchData() {
       try {
         const [ordenesRes, productosRes] = await Promise.all([
-          fetch('https://backend-project-v2.onrender.com/ordenes'),
-          fetch('https://backend-project-v2.onrender.com/productos'),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`),
         ]);
 
         const ordenesData = await ordenesRes.json();
@@ -88,7 +88,7 @@ export default function VistaOrdenes() {
 
   const fetchOrdenItems = async (ordenId: number) => {
     try {
-      const res = await fetch('https://backend-project-v2.onrender.com/orden-items');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orden-items`);
       const data: OrdenItem[] = await res.json();
       const filtrados = data.filter((item) => item.ordenId === ordenId);
       setOrdenItems(filtrados);
@@ -103,7 +103,7 @@ export default function VistaOrdenes() {
       
       // Si no tenemos los detalles completos, traerlos del backend
       if (!orden.email) {
-        const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${orden.id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${orden.id}`);
         ordenCompleta = await res.json();
       } else {
         ordenCompleta = orden;
@@ -156,7 +156,7 @@ export default function VistaOrdenes() {
 
   const cambiarEstado = async (id: number, estado: string) => {
     try {
-      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado }),
@@ -182,7 +182,7 @@ export default function VistaOrdenes() {
     if (!confirm('¿Deseas eliminar esta orden?')) return;
 
     try {
-      const res = await fetch(`https://backend-project-v2.onrender.com/ordenes/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Error al eliminar orden');
@@ -204,7 +204,7 @@ export default function VistaOrdenes() {
     if (!confirm('¿Deseas eliminar este producto de la orden?')) return;
 
     try {
-      const res = await fetch(`https://backend-project-v2.onrender.com/orden-items/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orden-items/${id}`, {
         method: 'DELETE',
       });
 
@@ -216,7 +216,7 @@ export default function VistaOrdenes() {
       // Recalcular y actualizar total
       const nuevoTotal = calcularTotal(nuevosItems);
 
-      await fetch(`https://backend-project-v2.onrender.com/ordenes/${editandoId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -236,17 +236,20 @@ export default function VistaOrdenes() {
 
   const guardarItemActualizado = async (item: OrdenItem) => {
     try {
-      const res = await fetch(`api.sgstudio.shop/orden-items/${item.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cantidad: item.cantidad }),
-      });
-
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orden-items/${item.id}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cantidad: item.cantidad }),
+        }
+      );
+      
       if (!res.ok) throw new Error('No se pudo actualizar el item');
 
       // Actualizar total después de guardar el item
       const nuevoTotal = calcularTotal(ordenItems);
-      await fetch(`https://backend-project-v2.onrender.com/ordenes/${editandoId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),
@@ -282,7 +285,7 @@ export default function VistaOrdenes() {
 
     try {
       // Crear item nuevo en backend
-      const res = await fetch('https://backend-project-v2.onrender.com/orden-items', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orden-items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -304,7 +307,7 @@ export default function VistaOrdenes() {
 
       // Actualizar total en backend y frontend
       const nuevoTotal = calcularTotal(nuevosItems);
-      await fetch(`https://backend-project-v2.onrender.com/ordenes/${editandoId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ total: nuevoTotal }),

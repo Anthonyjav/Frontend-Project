@@ -16,7 +16,7 @@ export default function ListarReclamos() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://backend-project-v2.onrender.com/reclamos')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/reclamos`)
       .then((res) => res.json())
       .then((data) => setReclamos(data))
       .catch((err) => {
@@ -31,7 +31,7 @@ export default function ListarReclamos() {
     if (!confirmar) return;
 
     try {
-      const res = await fetch(`https://backend-project-v2.onrender.com/reclamos/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reclamos/${id}`, {
         method: 'DELETE',
       });
 

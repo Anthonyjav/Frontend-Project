@@ -16,13 +16,17 @@ export default function CrearCategoriaForm({ onCategoriaCreada }) {
     }
 
     try {
-      const res = await fetch('https://backend-project-v2.onrender.com/categorias', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nombre, descripcion }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/categorias`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nombre, descripcion }),
+        }
+      );
+
 
       const data = await res.json();
 

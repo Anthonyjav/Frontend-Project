@@ -59,7 +59,7 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
     });
 
     try {
-      const res = await fetch(`https://backend-project-v2.onrender.com/productos/${producto.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos/${producto.id}`, {
         method: 'PUT',
         body: data,
       });

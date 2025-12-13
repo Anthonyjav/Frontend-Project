@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 export default function PagoExitoso() {
   const [respuesta, setRespuesta] = useState<any>(null);
 
-  useEffect(() => {   
-    setRespuesta({orderStatus: 'PAID', orderDetails: {orderTotalAmount: 1200, orderCurrency: 'PEN', orderId: '1'}, customer: {email: 'test@test.com', billingDetails: {firstName: 'Fabio', lastName: 'Vargas'}}, transactions: [{uuid: 'xxxx'}]});
-  }, []);
+  //useEffect(() => {   
+   // setRespuesta({orderStatus: 'PAID', orderDetails: {orderTotalAmount: 1200, orderCurrency: 'PEN', orderId: '1'}, customer: {email: 'test@test.com', billingDetails: {firstName: 'Fabio', lastName: 'Vargas'}}, transactions: [{uuid: 'xxxx'}]});
+  //}, []);
 
   if (!respuesta) return <p>Procesando datos...</p>;
 

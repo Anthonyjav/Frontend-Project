@@ -18,7 +18,9 @@ export default function NewArrivalsPage() {
   useEffect(() => {
     const fetchSeleccionados = async () => {
       try {
-        const res = await fetch('https://backend-project-v2.onrender.com/productos/seleccionados')
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/productos/seleccionados`
+      );
         const data = await res.json()
         setProductos(data)
 

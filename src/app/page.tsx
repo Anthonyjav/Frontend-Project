@@ -111,7 +111,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchProductos() {
       try {
-        const res = await fetch(`https://backend-project-v2.onrender.com/productos/`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos/`)
         if (!res.ok) throw new Error('Error al obtener productos');
         const data = await res.json();
         setProductos(data);

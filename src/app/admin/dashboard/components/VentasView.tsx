@@ -27,7 +27,7 @@ export default function VentasView() {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await axios.get<Orden[]>('https://backend-project-v2.onrender.com/ordenes');
+        const { data } = await axios.get<Orden[]>(`${process.env.NEXT_PUBLIC_API_URL}/ordenes`);
         // Normalize totals in case backend returns strings
         const normalized = data.map((o: any) => ({
           ...o,

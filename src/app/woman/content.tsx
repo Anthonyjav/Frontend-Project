@@ -15,16 +15,15 @@ export default function WomanContent() {
   const [categoriasAbiertas, setCategoriasAbiertas] = useState(false)
   const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>([])
 
-  /* ───────────────────────────────────────────────────────────────────────── */
-  /* Fetch de productos y categorías                                          */
-  /* ───────────────────────────────────────────────────────────────────────── */
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [resProd, resCat] = await Promise.all([
-          fetch('https://backend-project-v2.onrender.com/productos'),
-          fetch('https://backend-project-v2.onrender.com/categorias'),
-        ])
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos/`),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias/`),
+      ]);
+
         setProductos(await resProd.json())
         setCategorias(await resCat.json())
       } catch (err) {

@@ -38,8 +38,8 @@ export default function DashboardGraficos() {
   useEffect(() => {
     // Productos más vendidos
     Promise.all([
-      fetch('https://backend-project-v2.onrender.com/orden-items').then(res => res.json()),
-      fetch('https://backend-project-v2.onrender.com/productos').then(res => res.json()),
+      fetch( `${process.env.NEXT_PUBLIC_API_URL}/orden-items`).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`).then(res => res.json()),
     ]).then(([ordenItems, productos]: [OrdenItem[], Producto[]]) => {
       const mapaNombres = productos.reduce<Record<number, string>>((acc, prod: Producto) => {
         acc[prod.id] = prod.nombre;
@@ -61,7 +61,7 @@ export default function DashboardGraficos() {
     });
 
     // Órdenes e ingresos por día
-    fetch('https://backend-project-v2.onrender.com/ordenes')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes`)
       .then(res => res.json())
         .then((ordenes: any[]) => {
         const agrupado = ordenes.reduce<VentaPorDia[]>((acc, orden: any) => {
@@ -80,7 +80,7 @@ export default function DashboardGraficos() {
       });
 
     // Usuarios por mes
-    fetch('https://backend-project-v2.onrender.com/usuarios')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/usuarios`)
       .then(res => res.json())
       .then((usuarios: any[]) => {
         const agrupado = usuarios.reduce<UsuarioPorMes[]>((acc, u: any) => {
@@ -99,8 +99,8 @@ export default function DashboardGraficos() {
 
     // Productos por categoría
     Promise.all([
-      fetch('https://backend-project-v2.onrender.com/productos').then(res => res.json()),
-      fetch('https://backend-project-v2.onrender.com/categorias').then(res => res.json())
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`).then(res => res.json()),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias`).then(res => res.json())
     ]).then(([productos, categorias]: [Producto[], any[]]) => {
       const resumen = categorias.map((cat: any) => {
         const cantidad = productos.filter((p) => p.categoriaId === cat.id).length;
