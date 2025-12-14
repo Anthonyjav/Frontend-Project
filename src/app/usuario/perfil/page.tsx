@@ -212,7 +212,7 @@ export default function PerfilUsuario() {
       } catch (e) {
         // ignore
       }
-      console.log('DETALLE ORDEN RAW', data);
+      // Debug log removed: 'DETALLE ORDEN RAW'
       // Normalize a few commonly used fields
       data.total = typeof data.total === 'string' ? parseFloat(data.total) : Number(data.total || 0);
       data.createdAt = data.createdAt || data.created_at || data.date || null;
