@@ -218,8 +218,6 @@ export default function CheckoutPage() {
       };
 
       // 5. Solicitar formToken al backend
-      // Log temporal para depuración: ver exactamente lo que enviamos
-      console.log("[IziPay] bodyIzipay ->", bodyIzipay);
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/izipay/form-token`,
         bodyIzipay,
@@ -227,9 +225,6 @@ export default function CheckoutPage() {
           headers: { "Content-Type": "application/json" },
         }
       );
-
-
-      console.log("🔹 Respuesta del backend:", res.data);
 
       // 6. Guardar token para mostrar formulario IziPay
       setFormToken(res.data.formToken);
@@ -320,8 +315,7 @@ useEffect(() => {
         imagen: (item.producto && item.producto.imagen && item.producto.imagen[0]) || null
     }))
   });
-  // Log temporal para depuración en cliente: ver el contenido del input oculto
-  console.log("[IziPay] kr-hash-metadata ->", metadataInput.value);
+  // Metadata para IziPay (debug log removido)
   container.appendChild(metadataInput);
 
   // Enviar orderId explícito

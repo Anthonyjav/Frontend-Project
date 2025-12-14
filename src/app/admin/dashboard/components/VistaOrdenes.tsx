@@ -603,7 +603,7 @@ export default function VistaOrdenes() {
         <div className="mt-8 border-2 border-black rounded-lg overflow-hidden shadow-lg">
           {/* Encabezado del panel */}
           <div className="bg-black text-white p-4 flex justify-between items-center">
-            <h2 className="text-2xl font-bold">📋 Detalles Orden #{modalDetalle.id}</h2>
+            <h2 className="text-2xl font-bold">Detalles Orden #{modalDetalle.id}</h2>
             <button
               onClick={cerrarModalDetalle}
               className="text-3xl font-bold hover:text-gray-300"
@@ -643,7 +643,7 @@ export default function VistaOrdenes() {
             {/* FILA 2: Dirección */}
             {(hasValue(modalDetalle.pais) || hasValue(modalDetalle.departamento) || hasValue(modalDetalle.provincia) || hasValue(modalDetalle.distrito) || hasValue(modalDetalle.direccion)) && (
               <div className="border-t pt-4">
-                <p className="text-black font-bold mb-3">📍 Dirección de Envío</p>
+                <p className="text-black font-bold mb-3"> Dirección de Envío</p>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {hasValue(modalDetalle.pais) && (
                     <div>
@@ -688,7 +688,7 @@ export default function VistaOrdenes() {
               
               return (hasValue(modalDetalle.metodoEnvio) || hasValue(shippingMethodFromMeta) || hasValue(modalDetalle.paymentStatus) || hasValue(modalDetalle.paymentDate) || hasValue(modalDetalle.transactionId) || hasValue(modalDetalle.orderIdIzipay) || hasValue(referenciaFromMeta)) ? (
                 <div className="border-t pt-4">
-                  <p className="text-black font-bold mb-3">📦 Envío y Pago</p>
+                  <p className="text-black font-bold mb-3"> Envío y Pago</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {hasValue(modalDetalle.metodoEnvio) && (
                       <div>
@@ -743,7 +743,7 @@ export default function VistaOrdenes() {
 
             {/* FILA 4: Productos */}
             <div className="border-t pt-4">
-              <p className="text-black font-bold mb-3">🛍️ Productos de la Orden</p>
+              <p className="text-black font-bold mb-3">Productos de la Orden</p>
               <table className="w-full border border-gray-300 text-sm">
                 <thead className="bg-gray-200">
                   <tr>
@@ -782,7 +782,7 @@ export default function VistaOrdenes() {
 
             {/* FILA 5: Resumen financiero */}
             <div className="border-t pt-4 bg-gray-100 p-4 rounded">
-              <p className="text-black font-bold mb-3">💰 Resumen Financiero</p>
+              <p className="text-black font-bold mb-3">Resumen Financiero</p>
               <div className="space-y-2 text-right">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal:</span>
