@@ -184,8 +184,12 @@ export default function WomanContent() {
                         </span>
                       </div>
                     )}
+                    <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="bg-white rounded-full w-10 h-10 flex items-center justify-center shadow cursor-pointer">
+                        <span className="text-2xl font-bold text-gray-800 transform transition-transform duration-300 ease-in-out hover:rotate-90">+</span>
+                      </div>
+                    </div>
                   </div>
-
                   <div className="p-3 sm:p-4 text-center">
                     <p className="text-sm font-medium text-black truncate">{prod.nombre}</p>
                     <p className="text-sm font-normal text-gray-500">S/ {prod.precio}</p>

@@ -358,94 +358,126 @@ useEffect(() => {
   if (loading) return <p>Cargando...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-20">
+    <div className="min-h-screen bg-gray-50 px-6 py-40">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
 
         {/* IZQUIERDA */}
         <div className="bg-white p-8 rounded-lg shadow space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Datos del Pago</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Pago</h2>
+          <h3 className='text-sm font-light text-gray-500 mb-4' >Todas las transacciones son seguras y están encriptadas.</h3>
 
           {!showForm ? (
             <>
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="Nombre"
-                value={form.firstName}
-                onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
+              {/* Nombre y Apellido */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:border-black transition-colors duration-300 ease-in-out" placeholder="Nombre"
+                  value={form.firstName}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
 
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="Apellido"
-                value={form.lastName}
-                onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
+                <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none  focus:border-black transition-colors duration-300 ease-in-out" placeholder="Apellido"
+                  value={form.lastName}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
+              </div>
 
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="Email"
+              <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none  focus:border-black transition-colors duration-300 ease-in-out" placeholder="Email (obligatorio)"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })} />
 
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="Teléfono"
-                value={form.phoneNumber}
-                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} />
-
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="DNI"
+              <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none  focus:border-black transition-colors duration-300 ease-in-out" placeholder="DNI (obligatorio)"
                 value={form.identityCode}
                 onChange={(e) => setForm({ ...form, identityCode: e.target.value })} />
 
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="Dirección"
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })} />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input className="sm:col-span-2 w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none  focus:border-black transition-colors duration-300 ease-in-out" placeholder="Dirección"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })} />
 
-
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="País"
-                value={form.country}
-                onChange={(e) => setForm({ ...form, country: e.target.value })} />
-
-              <div className="form-section">
-                <label className="form-label">Ubicación</label>
-                <select className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10" 
-                  name="department"
-                  value={form.department}
-                  onChange={handleChange}>
-                  <option value="">Seleccione departamento</option>
-                  {departamentos.map((d: any) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-
-                <select className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10"
-                  name="state"
-                  value={form.state}
-                  onChange={handleChange}>
-                  <option value="">Seleccione provincia</option>
-                  {provincias.map((p: any) => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
-
-                <select className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10"
-                  name="city"
-                  value={form.city}
-                  onChange={handleChange}>
-                  <option value="">Seleccione distrito</option>
-                  {distritos.map((dd: any) => (
-                    <option key={dd} value={dd}>{dd}</option>
-                  ))}
-                </select>
+                <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white bg-gray-100 cursor-not-allowed" placeholder="País"
+                  value={form.country}
+                  onChange={(e) => setForm({ ...form, country: e.target.value })} 
+                  disabled/>
               </div>
 
-              <input className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400" placeholder="Referencia"
-                value={form.reference}
-                onChange={(e) => setForm({ ...form, reference: e.target.value })} />
+              <div className='relative'>
+              <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none  focus:border-black transition-colors duration-300 ease-in-out pr-10" placeholder="Teléfono"
+                value={form.phoneNumber}
+                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })} />
 
-              <select
-                className="mb-2 px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10"
-                value={form.shippingMethod}
-                onChange={(e) => setForm({ ...form, shippingMethod: e.target.value })}
-              >
-                <option value="">Seleccione método de envío</option>
-                <option value="shalom">Shalom</option>
-                <option value="olva">Olva Courier</option>
-              </select>
+                <div className="absolute inset-y-0 right-3 flex items-center group">
+                  <span className="w-4 h-4 flex items-center justify-center rounded-full
+                                  border-2 border-gray-600 text-xs text-gray-600
+                                  cursor-pointer select-none">
+                    ?
+                  </span>
 
+                  <div
+                    className="
+                      absolute right-0 top-full mt-2 w-48
+                      bg-black text-white text-xs rounded-md px-3 py-2
+                      opacity-0 scale-95 pointer-events-none
+                      group-hover:opacity-100 group-hover:scale-100
+                      transition
+                    "
+                  >
+                    En caso de que tengamos que contactarte sobre tu pedido.
+                  </div>
+                </div>
+
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-base font-semibold text-gray-800">Ubicación</label>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10 focus:outline-none focus:border-black transition-colors duration-200 ease-in-out" 
+                    name="department"
+                    value={form.department}
+                    onChange={handleChange}>
+                    <option value="">Departamento</option>
+                    {departamentos.map((d: any) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10 focus:outline-none focus:border-black transition-colors duration-200 ease-in-out"
+                    name="state"
+                    value={form.state}
+                    onChange={handleChange}>
+                    <option value="">Provincia</option>
+                    {provincias.map((p: any) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded text-sm bg-white  appearance-none pr-10 focus:outline-none focus:border-black transition-colors duration-200 ease-in-out"
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}>
+                    <option value="">Distrito</option>
+                    {distritos.map((dd: any) => (
+                      <option key={dd} value={dd}>{dd}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input className="w-full px-3 py-2 border border-gray-200 rounded text-sm text-black bg-white focus:outline-none  focus:border-black transition-colors duration-300 ease-in-out" placeholder="Referencia"
+                  value={form.reference}
+                  onChange={(e) => setForm({ ...form, reference: e.target.value })} />
+
+                <select
+                  className="w-full px-3 py-2 border border-gray-200 rounded text-sm bg-white appearance-none pr-10 focus:outline-none focus:border-black transition-colors duration-200 ease-in-out"
+                  value={form.shippingMethod}
+                  onChange={(e) => setForm({ ...form, shippingMethod: e.target.value })}
+                >
+                  <option value="">Seleccione método de envío</option>
+                  <option value="shalom">Shalom</option>
+                  <option value="olva">Olva Courier</option>
+                </select>
+              </div>
               <button
                 onClick={generarPago}
-                className="w-full bg-black text-white py-2 rounded"
+                className="btn-animated w-full rounded"
               >
                 Proceder al Pago
               </button>
@@ -457,42 +489,80 @@ useEffect(() => {
 
 
         {/* DERECHA */}
-        <div className="bg-white p-8 rounded-lg shadow space-y-4">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Resumen del Pedido</h2>
+        <div className="bg-white p-8 rounded-lg shadow space-y-6 self-start">
+          <h2 className="text-xl font-semibold text-gray-900">Resumen del Pedido</h2>
 
           {!carrito?.items?.length ? (
-            <p>Tu carrito está vacío.</p>
+            <p className="text-sm text-gray-500">Tu carrito está vacío.</p>
           ) : (
-            carrito.items.map((item: any, index: number) => (
-              <div key={index} className="flex items-center gap-4 border-b pb-4">
-                <img
-                  src={item.producto.imagen[0]}
-                  className="w-16 h-16 object-cover rounded"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800">{item.producto.nombre}</p>
-                  <p className="text-sm font-semibold text-gray-700">
-                    S/. {item.cantidad * item.producto.precio}
+            <div className="space-y-4">
+              {carrito.items.map((item: any, index: number) => (
+                <div 
+                  key={index} 
+                  className="flex items-start justify-between gap-4"
+                >
+                  {/* IZQUIERDA */}
+                  <div className="flex gap-3">
+                    <img
+                      src={item.producto.imagen[0]}
+                      className="w-14 h-16 object-cover rounded-md border"
+                    />
+
+                    <div>
+                      <p className="text-sm font-medium text-gray-800 leading-tight">
+                        {item.producto.nombre}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Cantidad: {item.cantidad}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Orden: {form.orderId}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* DERECHA */}
+                  <p className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                    S/ {item.cantidad * item.producto.precio}.00
                   </p>
-                  <p className="text-xs text-gray-500">Cantidad: {item.cantidad}</p>
-                  <p className="text-xs text-gray-500">Orden: {form.orderId}</p>
-
-
-
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
 
-          {carrito?.items?.length > 0 && (
-            <div className="mt-4 text-right">
-              <p className="text-lg text-black font-semibold">
-                Total: S/.{' '}
+          <hr className="border-gray-200" />
+
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between text-gray-700">
+              <span>Subtotal</span>
+              <span>
+                S/ {" "}
                 {carrito.items.reduce(
                   (t: number, i: any) => t + i.cantidad * i.producto.precio,
                   0
-                )}
-              </p>
+                )}.00
+              </span>
+            </div>
+
+            <div className="flex justify-between text-gray-500">
+              <span>Envío</span>
+              <span>Se calcula al ingresar la dirección</span>
+            </div>
+          </div>
+
+          {carrito?.items?.length > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-base font-semibold text-gray-900">
+                Total
+              </span>
+
+              <span className="text-xl font-semibold text-gray-900">
+                S/ {' '}
+                {carrito.items.reduce(
+                  (t: number, i: any) => t + i.cantidad * i.producto.precio,
+                  0
+                )}.00
+              </span>
             </div>
           )}
         </div>

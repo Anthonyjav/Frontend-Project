@@ -212,7 +212,7 @@ export default function ProductoDetalle() {
             </div>
           )}
 
-          <div className="max-w-6xl mx-auto flex flex-col lg:grid lg:grid-cols-[auto_500px_1fr] gap-6">
+          <div className="max-w-6xl mx-auto flex flex-col lg:grid lg:grid-cols-[auto_500px_1fr] gap-6 lg:gap-x-15">
             <div className="order-1 lg:order-1 flex flex-row lg:flex-col gap-3 items-center lg:items-start">
               {imagen.map((img: string, index: number) => (
                 <button
@@ -267,7 +267,7 @@ export default function ProductoDetalle() {
             </div>
 
             <div className="order-2 lg:order-3 space-y-6">
-              <h3 className="font-light text-5xl mb-3">{nombre}</h3>
+              <h3 className="font-light text-4xl mb-3">{nombre}</h3>
               <p className="font-medium text-2xl text-gray-500 mb-10">S/ {precio}</p>
               
               <div className="flex flex-col gap-3">
@@ -288,7 +288,7 @@ export default function ProductoDetalle() {
                             key={i}
                             onClick={() => setSelectedColor(c)}
                             title={c}
-                            className={`w-9 h-9 rounded-sm flex items-center justify-center cursor-pointer border-3 border-white bg-white shadow-[0_1px_3px_rgba(0,0,0,0.40)] ${isSelected ? 'shadow-[0_4px_8px_rgba(0,0,0,0.50)]' : ''} transition-all duration-200'}`}
+                            className={`w-8 h-8 rounded-sm flex items-center justify-center cursor-pointer border-3 border-white bg-white shadow-[0_1px_3px_rgba(0,0,0,0.40)] ${isSelected ? 'shadow-[0_4px_8px_rgba(0,0,0,0.50)]' : ''} transition-all duration-200'}`}
                             style={{ backgroundColor: valid ? c : 'transparent' }}
                           >
                             {!valid && <span className="text-xs text-gray-700">{c}</span>}
@@ -312,7 +312,7 @@ export default function ProductoDetalle() {
                         <button
                           key={idx}
                           onClick={() => setSelectedSize(s)}
-                          className={`w-13 px-0 py-3 border rounded-none text-sm cursor-pointer transition-all duration-200 ${selectedSize === s ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-black hover:text-white'}`}
+                          className={`w-12 px-0 py-3 border rounded-none text-sm cursor-pointer transition-all duration-200 ${selectedSize === s ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-black hover:text-white'}`}
                         >
                           {s}
                         </button>
@@ -360,7 +360,7 @@ export default function ProductoDetalle() {
                 <div className="border-t pt-4">
                   <button
                     onClick={() => setMostrarDescripcion(!mostrarDescripcion)}
-                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg"
+                    className="flex items-center justify-between w-full text-left text-black font-medium text-normal"
                   >
                     Descripción
 
@@ -415,7 +415,7 @@ export default function ProductoDetalle() {
                 <div className="border-t pt-4">
                   <button
                     onClick={() => setMostrarComposicion(!mostrarComposicion)}
-                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg"
+                    className="flex items-center justify-between w-full text-left text-black font-medium text-normal"
                   >
                     Composición
 
@@ -460,7 +460,7 @@ export default function ProductoDetalle() {
                 <div className="border-t pt-4">
                   <button
                     onClick={() => setMostrarCuidado(!mostrarCuidado)}
-                    className="flex items-center justify-between w-full text-left text-black font-medium text-lg"
+                    className="flex items-center justify-between w-full text-left text-black font-medium text-normal"
                   >
                     Cuidado del producto
 
@@ -513,9 +513,13 @@ export default function ProductoDetalle() {
                 </div>
               </div>
           </div>
-
+          {/* Línea separadora */}
+            <div className="flex justify-center mt-20">
+              <div className="w-full h-[2px] bg-gray-300"></div>
+            </div>
           {/* Recomendaciones */}
-          <div className="max-w-6xl mx-auto mt-30">
+          <div className="max-w-6xl mx-auto mt-20">
+          
             <h5 className="text-2xl font-medium text-center mb-10 justify-center">TAMBIÉN PODRÍA GUSTARTE</h5>
             {loadingRec ? (
               <p>Cargando recomendaciones...</p>
