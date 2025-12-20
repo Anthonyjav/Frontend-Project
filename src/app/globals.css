@@ -159,3 +159,10 @@ body {
 .animate-fade-in-left {
   animation: fadeInLeft 0.6s ease-out forwards;
 }
+#izipay-form .kr-embedded,
+#izipay-form .kr-embedded iframe {
+  width: 100%;
+  height: auto !important;
+  min-height: 200px;
+  overflow: visible;
+}

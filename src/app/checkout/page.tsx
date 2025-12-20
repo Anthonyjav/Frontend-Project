@@ -482,7 +482,7 @@ useEffect(() => {
               </button>
             </>
           ) : (
-            <div id="izipay-form" className="mt-4"></div>
+            <div id="izipay-form" className="mt-4 h-auto"></div>
           )}
         </div>
 
