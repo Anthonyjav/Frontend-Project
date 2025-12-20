@@ -106,7 +106,7 @@ export default function CrearProductoForm() {
   };
 
   // --- Opciones para seleccionar ---
-  const availableColors = [
+  const initialColors = [
     { name: 'Rojo', hex: '#DC2626' },
     { name: 'Azul', hex: '#2563EB' },
     { name: 'Verde', hex: '#16A34A' },
@@ -115,6 +115,10 @@ export default function CrearProductoForm() {
     { name: 'Gris', hex: '#4B5563' },
     { name: 'Amarillo', hex: '#CA8A04' },
   ];
+  const [availableColors, setAvailableColors] = useState(initialColors);
+  const [newColorHex, setNewColorHex] = useState('#000000');
+  const [newColorName, setNewColorName] = useState('');
+  const [colorMessageLocal, setColorMessageLocal] = useState('');
   const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const handleColorChange = (e) => {
@@ -136,6 +140,24 @@ export default function CrearProductoForm() {
       );
     }
   };
+
+  // Permite agregar un color personalizado a la paleta
+  const handleAddColor = () => {
+    const hex = (newColorHex || '#000000').toUpperCase();
+    const name = newColorName.trim() || hex;
+    if (availableColors.some((c) => c.hex.toUpperCase() === hex)) {
+      setColorMessageLocal('Este color ya está en la paleta');
+      setTimeout(() => setColorMessageLocal(''), 2500);
+      return;
+    }
+    const newColor = { name, hex };
+    setAvailableColors((prev) => [newColor, ...prev]);
+    setColoresSeleccionados((prev) => [...prev, hex]);
+    setNewColorName('');
+    setNewColorHex('#000000');
+    setColorMessageLocal('Color agregado');
+    setTimeout(() => setColorMessageLocal(''), 2000);
+  }; 
 
   return (
     <div className="bg-white rounded-xl p-8 shadow-md mt-12 max-w-4xl mx-auto">
@@ -190,26 +212,53 @@ export default function CrearProductoForm() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Colores *</label>
             <div className="grid grid-cols-3 gap-2 p-2 rounded-md border border-gray-200 bg-gray-100">
               {availableColors.map((color) => (
-                <label key={color.name} className="flex items-center space-x-2 text-sm text-gray-800 cursor-pointer">
+                <label key={color.hex} className="flex items-center space-x-2 text-sm text-gray-800 cursor-pointer">
                   <input
                     type="checkbox"
                     value={color.hex}
                     checked={coloresSeleccionados.includes(color.hex)}
                     onChange={handleColorChange}
-                    className="rounded border-gray-300 text-gray-600 shadow-sm focus:border-gray-300 focus:ring focus:ring-gray-200 focus:ring-opacity-50"
+                    className="sr-only peer"
                   />
+
                   <span
-                    className={`w-4 h-4 rounded-full inline-block ${
-                      color.name === 'Blanco' ? 'border border-gray-400' : ''
-                    }`}
+                    className={`w-6 h-6 rounded-full inline-block ${color.hex.toUpperCase() === '#FFFFFF' ? 'border border-gray-400' : ''} peer-checked:ring-2 peer-checked:ring-offset-2 peer-checked:ring-indigo-500`}
                     style={{ backgroundColor: color.hex }}
+                    aria-hidden
                   ></span>
-                  <span>
-                    {color.name}
-                  </span>
+
+                  <span className="text-xs">{color.name}</span>
                 </label>
               ))}
             </div>
+
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                type="color"
+                value={newColorHex}
+                onChange={(e) => setNewColorHex(e.target.value)}
+                className="w-10 h-10 p-0 border rounded"
+                aria-label="Seleccionar color"
+              />
+
+              <input
+                type="text"
+                value={newColorName}
+                onChange={(e) => setNewColorName(e.target.value)}
+                placeholder="Nombre (opcional)"
+                className="px-2 py-1 rounded border w-full text-sm"
+              />
+
+              <button
+                type="button"
+                onClick={handleAddColor}
+                className="px-3 py-2 bg-gray-800 text-white rounded text-sm"
+              >
+                Agregar
+              </button>
+            </div>
+
+            {colorMessageLocal && <p className="text-xs text-gray-600 mt-1">{colorMessageLocal}</p>}
           </div>
 
           <input

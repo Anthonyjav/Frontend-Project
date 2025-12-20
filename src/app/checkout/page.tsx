@@ -277,8 +277,7 @@ useEffect(() => {
       "84426447:testpublickey_QCOElYQ9EppkGyhK4vn9LVgZaoq5sgvrriJkgDpiei39L"
   );
 
-  // 5️⃣ CONFIGURAR URLs DE REDIRECCIÓN EN IZIPAY
-  // kr-post-url-success: cuando el pago es EXITOSO
+ 
   container.setAttribute(
     "kr-post-url-success",
     `${process.env.NEXT_PUBLIC_API_URL}/api/izipay/pago-exitoso`
@@ -523,7 +522,7 @@ useEffect(() => {
 
                   {/* DERECHA */}
                   <p className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                    S/ {item.cantidad * item.producto.precio}.00
+                    S/ {item.cantidad * item.producto.precio}
                   </p>
                 </div>
               ))}
@@ -540,7 +539,7 @@ useEffect(() => {
                 {carrito.items.reduce(
                   (t: number, i: any) => t + i.cantidad * i.producto.precio,
                   0
-                )}.00
+                )}
               </span>
             </div>
 
@@ -561,7 +560,7 @@ useEffect(() => {
                 {carrito.items.reduce(
                   (t: number, i: any) => t + i.cantidad * i.producto.precio,
                   0
-                )}.00
+                )}
               </span>
             </div>
           )}
