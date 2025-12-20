@@ -92,6 +92,7 @@ type Producto = {
   descripcion: string
   imagen: string[]
   seleccionado: boolean
+  activo?: boolean | number | string
 }
 
 export default function Home() {
@@ -114,7 +115,9 @@ export default function Home() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos/`)
         if (!res.ok) throw new Error('Error al obtener productos');
         const data = await res.json();
-        setProductos(data);
+        // Filtrar sólo productos activos (activo puede ser boolean, número o '1'/'0')
+        const activos = (data || []).filter((p: any) => p && (p.activo === true || p.activo === '1' || p.activo === 1));
+        setProductos(activos);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -133,7 +136,7 @@ export default function Home() {
     }
   }, [loading, fadeSplash])
 
-  const items = productos.filter(p => Array.isArray(p.imagen) && p.imagen.length > 0)
+  const items = productos.filter(p => (p.activo === true || p.activo === '1' || p.activo === 1) && Array.isArray(p.imagen) && p.imagen.length > 0)
   const perPage = 4
   const pageCount = Math.ceil(items.length / perPage)
   const start = page * perPage

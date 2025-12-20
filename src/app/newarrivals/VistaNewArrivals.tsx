@@ -22,11 +22,13 @@ export default function NewArrivalsPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/productos/seleccionados`
       );
         const data = await res.json()
-        setProductos(data)
+        // Filtrar sólo los seleccionados que también están activos
+        const activos = (data || []).filter((p: any) => p && (p.activo === true || p.activo === '1' || p.activo === 1))
+        setProductos(activos)
 
         const categoriasUnicas = Array.from(
           new Map(
-            data
+            activos
               .filter((p: any) => p.categoria)
               .map((p: any) => [p.categoria.id, p.categoria])
           ).values()
@@ -60,6 +62,7 @@ export default function NewArrivalsPage() {
 
   const productosFiltrados = productos.filter(
     p =>
+      (p.activo === true || p.activo === '1' || p.activo === 1) &&
       (categoriasSeleccionadas.length === 0 ||
         categoriasSeleccionadas.includes(p.categoria?.nombre)) &&
       Array.isArray(p.imagen) &&

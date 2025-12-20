@@ -7,7 +7,8 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
     nombre: '',
     precio: '',
     descripcion: '',
-    imagen: [], 
+    imagen: [],
+    activo: true,
   });
 
   const [nuevasImagenes, setNuevasImagenes] = useState([]);
@@ -19,13 +20,15 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
         precio: producto.precio || '',
         descripcion: producto.descripcion || '',
         imagen: producto.imagen || [],
+        activo: typeof producto.activo === 'boolean' ? producto.activo : true,
       });
     }
   }, [producto]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, type, value, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
   const handleRemoveImagen = (index) => {
@@ -47,6 +50,7 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
     data.append('nombre', formData.nombre);
     data.append('precio', formData.precio);
     data.append('descripcion', formData.descripcion);
+    data.append('activo', formData.activo);
 
     formData.imagen.forEach((url) => data.append('imagenesActuales', url));
     nuevasImagenes.forEach((img) => data.append('nuevasImagenes', img));
@@ -107,6 +111,18 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
           className="w-full p-2 border rounded"
           required
         />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          id="activo"
+          type="checkbox"
+          name="activo"
+          checked={!!formData.activo}
+          onChange={handleChange}
+          className="h-4 w-4"
+        />
+        <label htmlFor="activo" className="font-semibold">Activo</label>
       </div>
 
       <div>

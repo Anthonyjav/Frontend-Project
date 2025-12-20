@@ -72,7 +72,10 @@ export default function ListarProductosAdmin() {
   };
 
   const abrirModalEditar = (producto) => {
-    setProductoEditando(producto);
+    setProductoEditando({
+      ...producto,
+      activo: typeof producto.activo === 'boolean' ? producto.activo : true,
+    });
     nuevaImagenesURLs.current.forEach((url) => URL.revokeObjectURL(url));
     nuevaImagenesURLs.current = [];
     setNuevaImagenes([]);
@@ -106,7 +109,12 @@ export default function ListarProductosAdmin() {
     try {
       const formData = new FormData();
       Object.entries(productoEditando).forEach(([k, v]) => {
-        if (v !== null && v !== undefined) formData.append(k, v);
+        if (v === null || v === undefined) return;
+        if (k === 'activo' || k === 'seleccionado') {
+          formData.append(k, v ? '1' : '0');
+        } else {
+          formData.append(k, v);
+        }
       });
       nuevaImagenes.forEach((file) => formData.append('imagenes', file));
       const token = localStorage.getItem('token');
@@ -189,7 +197,12 @@ export default function ListarProductosAdmin() {
               <h3 className="text-lg font-semibold text-gray-900 truncate mb-1">
                 {producto.nombre}
               </h3>
-              <p className="text-sm font-bold text-gray-800 mb-2">S/ {producto.precio}</p>
+              <div className="flex items-center gap-3 mb-2">
+                <p className="text-sm font-bold text-gray-800">S/ {producto.precio}</p>
+                <span className={`text-xs font-medium ${producto.activo ? 'text-green-600' : 'text-red-600'}`}>
+                  {producto.activo ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
               <ul className="text-sm text-gray-700 space-y-1 mb-4">
                 {producto.categoria?.nombre && (
                   <li>
@@ -370,6 +383,16 @@ export default function ListarProductosAdmin() {
                     className="h-4 w-4 text-black"
                   />
                   <span className="text-gray-700">Seleccionado</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="activo"
+                    checked={productoEditando.activo || false}
+                    onChange={handleCambio}
+                    className="h-4 w-4 text-black"
+                  />
+                  <span className="text-gray-700">Activo</span>
                 </label>
                 <label>
                   <span className="text-gray-700">Imágenes nuevas:</span>

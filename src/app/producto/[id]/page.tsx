@@ -67,6 +67,15 @@ export default function ProductoDetalle() {
       if (!res.ok) throw new Error('Error al obtener el producto');
 
       const data = await res.json();
+      // Si el producto no está activo, mostrar como no disponible
+      if (!(data && (data.activo === true || data.activo === '1' || data.activo === 1))) {
+        setProducto(null);
+        setError('Producto no disponible');
+        setLoading(false);
+        setIsLoading(false);
+        return;
+      }
+
       const ajustarURL = (url: string) => {
         if (!url.startsWith('http')) {
           return `https://api.sgstudio.shop${url.startsWith('/') ? '' : '/'}${url}`;
@@ -126,7 +135,9 @@ export default function ProductoDetalle() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/productos`);
         if (!res.ok) throw new Error('Error al obtener recomendados');
         const datos = await res.json();
-        const otros = datos.filter((p: any) => String(p.id) !== String(idActual));
+        // Usar sólo productos activos como recomendados
+        const activos = (datos || []).filter((p: any) => p && (p.activo === true || p.activo === '1' || p.activo === 1));
+        const otros = activos.filter((p: any) => String(p.id) !== String(idActual));
         const shuffled = otros.sort(() => 0.5 - Math.random());
         setRecomendados(shuffled.slice(0, 4));
       } catch (err) {

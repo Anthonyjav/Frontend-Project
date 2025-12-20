@@ -623,7 +623,15 @@ const bgClass = scrolled || hovered || showSearch
         />
         <div className="flex flex-col flex-1">
           <span className="text-sm font-semibold text-black">{item.producto.nombre}</span>
-          <span className="text-xs text-gray-600">Talla: {item.talla} | Color: {item.color}</span>
+          <span className="text-xs text-gray-600 flex items-center gap-2">
+            Talla: {item.talla} | Color:
+            <span
+              className="w-4 h-4 rounded border border-gray-300"
+              style={{ backgroundColor: item.color }}
+              title={item.color}
+            />
+          </span>
+
 
           <div className="flex items-center mt-2">
             <button

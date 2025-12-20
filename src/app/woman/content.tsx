@@ -24,7 +24,9 @@ export default function WomanContent() {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/categorias/`),
       ]);
 
-        setProductos(await resProd.json())
+        const allProductos = await resProd.json()
+        const activos = (allProductos || []).filter((p: any) => p && (p.activo === true || p.activo === '1' || p.activo === 1))
+        setProductos(activos)
         setCategorias(await resCat.json())
       } catch (err) {
         console.error('Error cargando datos', err)
@@ -54,6 +56,7 @@ export default function WomanContent() {
 
   const productosFiltrados = productos.filter(
     p =>
+      (p.activo === true || p.activo === '1' || p.activo === 1) &&
       (categoriasSeleccionadas.length === 0 ||
         categoriasSeleccionadas.includes(p.categoria?.nombre)) &&
       Array.isArray(p.imagen) &&
