@@ -20,7 +20,8 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
         precio: producto.precio || '',
         descripcion: producto.descripcion || '',
         imagen: producto.imagen || [],
-        activo: typeof producto.activo === 'boolean' ? producto.activo : true,
+        // Normalize activo so it works if backend/frontend send true/false, '1'/'0', or 1/0
+        activo: producto.activo === true || producto.activo === '1' || producto.activo === 1,
       });
     }
   }, [producto]);
@@ -50,10 +51,16 @@ export default function EditarProductoForm({ producto, onGuardado, onCancelar })
     data.append('nombre', formData.nombre);
     data.append('precio', formData.precio);
     data.append('descripcion', formData.descripcion);
-    data.append('activo', formData.activo);
+    // Send activo as 'true' or 'false' to match backend expectation
+    data.append('activo', formData.activo ? 'true' : 'false');
 
     formData.imagen.forEach((url) => data.append('imagenesActuales', url));
     nuevasImagenes.forEach((img) => data.append('nuevasImagenes', img));
+
+    // Debug: log the FormData contents to the console (remove after testing)
+    for (const pair of data.entries()) {
+      console.log('FormData:', pair[0], pair[1]);
+    }
 
     try {
       const token = localStorage.getItem('token'); 

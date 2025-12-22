@@ -74,7 +74,8 @@ export default function ListarProductosAdmin() {
   const abrirModalEditar = (producto) => {
     setProductoEditando({
       ...producto,
-      activo: typeof producto.activo === 'boolean' ? producto.activo : true,
+      // Normalize various representations (boolean, '1'/'0', 1/0) to a proper boolean
+      activo: producto.activo === true || producto.activo === '1' || producto.activo === 1,
     });
     nuevaImagenesURLs.current.forEach((url) => URL.revokeObjectURL(url));
     nuevaImagenesURLs.current = [];
@@ -111,7 +112,8 @@ export default function ListarProductosAdmin() {
       Object.entries(productoEditando).forEach(([k, v]) => {
         if (v === null || v === undefined) return;
         if (k === 'activo' || k === 'seleccionado') {
-          formData.append(k, v ? '1' : '0');
+          // send boolean-like fields as 'true' or 'false' to match backend expectation
+          formData.append(k, v ? 'true' : 'false');
         } else {
           formData.append(k, v);
         }
@@ -119,7 +121,7 @@ export default function ListarProductosAdmin() {
       nuevaImagenes.forEach((file) => formData.append('imagenes', file));
       const token = localStorage.getItem('token');
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/productos/${productoEditando.id}`,
+
         { method: 'PUT',headers: {
           Authorization: `Bearer ${token}`,
         }, body: formData }
@@ -199,8 +201,8 @@ export default function ListarProductosAdmin() {
               </h3>
               <div className="flex items-center gap-3 mb-2">
                 <p className="text-sm font-bold text-gray-800">S/ {producto.precio}</p>
-                <span className={`text-xs font-medium ${producto.activo ? 'text-green-600' : 'text-red-600'}`}>
-                  {producto.activo ? 'Activo' : 'Inactivo'}
+                <span className={`text-xs font-medium ${(producto.activo === true || producto.activo === '1' || producto.activo === 1) ? 'text-green-600' : 'text-red-600'}`}>
+                  {(producto.activo === true || producto.activo === '1' || producto.activo === 1) ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
               <ul className="text-sm text-gray-700 space-y-1 mb-4">
@@ -388,7 +390,7 @@ export default function ListarProductosAdmin() {
                   <input
                     type="checkbox"
                     name="activo"
-                    checked={productoEditando.activo || false}
+                    checked={!!productoEditando.activo}
                     onChange={handleCambio}
                     className="h-4 w-4 text-black"
                   />
