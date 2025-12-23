@@ -161,8 +161,135 @@ body {
 }
 #izipay-form .kr-embedded,
 #izipay-form .kr-embedded iframe {
+  overflow: visible !important;
+  background: transparent !important;
+  z-index: 0;
+}
+
+
+/* Izipay personalization fallback (aplica si el CSS externo falla o tarda en cargar) */
+#izipay-form .kr-embedded {
+  background-color: #fff !important;
+  border-radius: 6px;
+  border: 1px solid #b3b6b5 !important;
+  box-shadow: 0px 10px 25px rgba(92, 99, 105, 0.2);
+  padding: 20px !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 20px auto !important;
+}
+
+/* Contenedor con logo y estilos recomendados por IziPay */
+.Contains-form {
+  position: relative;
+  display: block;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0px 10px 25px rgba(92, 99, 105, .2);
+  border: 1px solid #b3b6b5 !important;
   width: 100%;
+  max-width: 420px;
+  margin: 20px auto 25px !important;
+
+  /* espacio arriba SOLO para el logo */
+  padding: 70px 25px 25px !important;
+}
+
+/* Logo encima del formulario: ocultamos el logo local por defecto para evitar duplicados con el header de IziPay */
+.Contains-form::before{
+  display: none !important;
+}
+
+/* Mostrar logo local SÓLO si detectamos que IziPay se inyecta en un iframe (o no tiene header interno) */
+.Contains-form.show-local-logo::before{
+  content: "";
+  position: absolute;
+  top: 10px; /* ajustar para que quede parcialmente fuera del contenedor */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 70px;
+  background-image: url("https://github.com/izipay-pe/Imagenes/blob/main/logos_izipay/logo-izipay-sinFondo-250x102.png?raw=true");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  display: block !important;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+/* Asegurarnos de mostrar el header/logo que provee IziPay */
+#izipay-form .kr-header,
+#izipay-form .kr-embedded .kr-header,
+#izipay-form .kr-embedded-header {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   height: auto !important;
-  min-height: 200px;
-  overflow: visible;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+  background: transparent !important;
+}
+
+#izipay-form .kr-header img,
+#izipay-form .kr-embedded .kr-header img,
+#izipay-form .kr-embedded-header img {
+  display: block !important;
+  max-width: 160px !important;
+  height: auto !important;
+  margin: 0 auto 12px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+
+
+#izipay-form .kr-embedded .kr-payment-button {
+  color: #ffffff !important;
+  background-color: #00A09D !important;
+  border-radius: 4px !important;
+  height: 55px !important;
+}
+
+#izipay-form .kr-embedded .kr-pan,
+#izipay-form .kr-embedded .kr-expiry,
+#izipay-form .kr-embedded .kr-security-code,
+#izipay-form .kr-embedded .kr-installment-number,
+#izipay-form .kr-embedded .kr-first-installment-delay {
+  height: 45px !important;
+  border-radius: 4px !important;
+}
+
+#izipay-form .kr-embedded .kr-field-wrapper {
+  margin-top: 6px !important;
+  margin-left: 10px !important;
+}
+
+/* Mejorar disposición de los elementos de seguridad/expiración */
+.content-security-expiry{
+  display: flex!important;
+  flex-direction: row!important;
+  justify-content: space-around!important;
+}
+#izipay-form .kr-header,
+#izipay-form .kr-embedded .kr-header,
+#izipay-form .kr-embedded-header {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  height: auto !important;
+  text-align: center !important;
+  margin-bottom: 12px !important;
+  background: transparent !important;
+}
+
+#izipay-form .kr-header img,
+#izipay-form .kr-embedded .kr-header img,
+#izipay-form .kr-embedded-header img {
+  display: block !important;
+  max-width: 160px !important;
+  height: auto !important;
+  margin: 0 auto 12px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }

@@ -255,6 +255,9 @@ useEffect(() => {
   const target = document.getElementById("izipay-form");
   if (!target) return;
 
+  // Evitar doble inicialización si ya existe el formulario
+  if (target.querySelector('.kr-embedded')) return;
+
   target.innerHTML = "";
 
   // 3️⃣ CSS UNA SOLA VEZ
@@ -267,8 +270,18 @@ useEffect(() => {
     document.head.appendChild(link);
   }
 
+  // Cargar CSS de personalización IziPay (si no existe)
+  if (!document.getElementById("krypton-style-personal")) {
+    const link2 = document.createElement("link");
+    link2.id = "krypton-style-personal";
+    link2.rel = "stylesheet";
+    link2.href = "https://raw.githubusercontent.com/izipay-pe/Personalizacion/main/Formulario%20Incrustado/Style-Personalization-Incrustado.css";
+    document.head.appendChild(link2);
+  }
+
   // 4️⃣ CREAR FORMULARIO
   const container = document.createElement("div");
+  // Dejar solo la clase `kr-embedded` para evitar duplicar el contenedor `.Contains-form`
   container.className = "kr-embedded";
   container.setAttribute("kr-form-token", formToken);
   container.setAttribute("kr-language", "es-PE");
@@ -330,6 +343,23 @@ useEffect(() => {
 
   target.appendChild(container);
 
+  const parentContains = target.closest('.Contains-form');
+  let observer: MutationObserver | null = null;
+  const updateLogoClass = () => {
+    const hasIframe = !!target.querySelector('iframe');
+    const hasHeaderImg = !!target.querySelector('.kr-header img, .kr-embedded-header img');
+    if (parentContains) {
+      // Si hay iframe (cross-origin) o no hay header img, mostramos logo local
+      if (hasIframe || !hasHeaderImg) parentContains.classList.add('show-local-logo');
+      else parentContains.classList.remove('show-local-logo');
+    }
+  };
+
+  // comprobar ahora y luego observar cambios (cuando IziPay inyecte contenido async)
+  updateLogoClass();
+  observer = new MutationObserver(() => updateLogoClass());
+  observer.observe(target, { childList: true, subtree: true });
+
   // 6️⃣ CARGAR SCRIPTS SOLO UNA VEZ
   if (!document.getElementById("krypton-script-main")) {
     const script1 = document.createElement("script");
@@ -348,10 +378,18 @@ useEffect(() => {
     script2.async = true;
     document.body.appendChild(script2);
   }
+
+  // Cleanup: remover el contenedor cuando el modal se cierra o cambian deps
+  return () => {
+    const t = document.getElementById("izipay-form");
+    if (t) t.innerHTML = "";
+    try { if (observer) observer.disconnect(); } catch (e) { /* noop */ }
+  };
 }, [formToken, carrito]);
 
 // FORZAR estilos inline en inputs del checkout para evitar overrides externos (temporal)
 // NOTE: Removed temporary inline style enforcer; inputs now use Tailwind-like classes.
+
 
 
   if (loading) return <p>Cargando...</p>;
@@ -482,7 +520,9 @@ useEffect(() => {
               </button>
             </>
           ) : (
-            <div id="izipay-form" className="mt-4 h-auto"></div>
+            <div className="Contains-form">
+              <div id="izipay-form"></div>
+            </div>
           )}
         </div>
 
