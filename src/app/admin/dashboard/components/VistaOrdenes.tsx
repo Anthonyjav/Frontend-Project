@@ -92,10 +92,12 @@ export default function VistaOrdenes() {
       const data: OrdenItem[] = await res.json();
       const filtrados = data.filter((item) => item.ordenId === ordenId);
       setOrdenItems(filtrados);
+      return filtrados;
     } catch (error) {
       console.error('Error al obtener los items:', error);
+      return [];
     }
-  };
+  }; 
 
   const abrirModalDetalle = async (orden: Orden) => {
     try {
@@ -110,21 +112,35 @@ export default function VistaOrdenes() {
       }
       
       // Extraer metadata del paymentResponse
-      const metadata = extractMetadata(ordenCompleta);
+      const metadata: any = extractMetadata(ordenCompleta);
       
       // Agregar datos de metadata a la orden si existen
       if (metadata) {
         if (metadata.shippingMethod) ordenCompleta.shippingMethod = metadata.shippingMethod;
         if (metadata.referencia) ordenCompleta.referencia = metadata.referencia;
         if (metadata.orderId) ordenCompleta.orderIdIzipay = metadata.orderId;
+        if (typeof metadata.shippingCost !== 'undefined') ordenCompleta.envio = Number(metadata.shippingCost);
       }
       
+      // Obtener items y calcular subtotal
+      const items = await fetchOrdenItems(ordenCompleta.id);
+      const subtotal = calcularTotal(items);
+
+      // Determinar envío (prioriza metadata, luego campo envio o método)
+      const shippingMethodFromMeta = metadata?.shippingMethod || ordenCompleta.shippingMethod;
+      const envioComputed = typeof ordenCompleta.envio === 'number' && ordenCompleta.envio > 0
+        ? ordenCompleta.envio
+        : (shippingMethodFromMeta === 'olva' ? 20 : (shippingMethodFromMeta === 'recojo' ? 0 : Number(ordenCompleta.envio) || 0));
+
+      ordenCompleta.subtotal = subtotal;
+      ordenCompleta.envio = envioComputed;
+      ordenCompleta.total = subtotal + envioComputed;
+
       setModalDetalle(ordenCompleta);
-      await fetchOrdenItems(ordenCompleta.id);
     } catch (error) {
       console.error('Error al obtener detalles:', error);
     }
-  };
+  }; 
 
   const cerrarModalDetalle = () => {
     setModalDetalle(null);
@@ -153,6 +169,17 @@ export default function VistaOrdenes() {
       return {};
     }
   };
+
+  // Determinar costo de envío basado en metadata o método
+  const determineEnvioForOrder = (orden?: Orden) => {
+    const metadata: any = orden ? extractMetadata(orden) : {};
+    if (metadata && typeof metadata.shippingCost !== 'undefined') return Number(metadata.shippingCost) || 0;
+    const method = metadata?.shippingMethod || orden?.shippingMethod || orden?.metodoEnvio;
+    if (method === 'olva') return 20;
+    if (method === 'recojo') return 0;
+    return Number(orden?.envio) || 0;
+  };
+  
 
   const cambiarEstado = async (id: number, estado: string) => {
     try {
@@ -213,18 +240,21 @@ export default function VistaOrdenes() {
       const nuevosItems = ordenItems.filter((item) => item.id !== id);
       setOrdenItems(nuevosItems);
 
-      // Recalcular y actualizar total
-      const nuevoTotal = calcularTotal(nuevosItems);
+      // Recalcular subtotal, envío y total
+      const nuevoSubtotal = calcularTotal(nuevosItems);
+      const ordenActual = ordenes.find(o => o.id === editandoId);
+      const envioToSend = determineEnvioForOrder(ordenActual);
+      const nuevoTotal = nuevoSubtotal + envioToSend;
 
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total: nuevoTotal }),
+        body: JSON.stringify({ total: nuevoTotal, subtotal: nuevoSubtotal, envio: envioToSend }),
       });
 
       setOrdenes((prev) =>
         prev.map((orden) =>
-          orden.id === editandoId ? { ...orden, total: nuevoTotal } : orden
+          orden.id === editandoId ? { ...orden, total: nuevoTotal, subtotal: nuevoSubtotal, envio: envioToSend } : orden
         )
       );
 
@@ -247,17 +277,21 @@ export default function VistaOrdenes() {
       
       if (!res.ok) throw new Error('No se pudo actualizar el item');
 
-      // Actualizar total después de guardar el item
-      const nuevoTotal = calcularTotal(ordenItems);
+      // Actualizar subtotal, envío y total después de guardar el item
+      const nuevoSubtotal = calcularTotal(ordenItems);
+      const ordenActual = ordenes.find(o => o.id === editandoId);
+      const envioToSend = determineEnvioForOrder(ordenActual);
+      const nuevoTotal = nuevoSubtotal + envioToSend;
+
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total: nuevoTotal }),
+        body: JSON.stringify({ total: nuevoTotal, subtotal: nuevoSubtotal, envio: envioToSend }),
       });
 
       setOrdenes((prev) =>
         prev.map((orden) =>
-          orden.id === editandoId ? { ...orden, total: nuevoTotal } : orden
+          orden.id === editandoId ? { ...orden, total: nuevoTotal, subtotal: nuevoSubtotal, envio: envioToSend } : orden
         )
       );
 
@@ -305,17 +339,21 @@ export default function VistaOrdenes() {
       setAgregandoProducto(false);
       setProductoParaAgregar(null);
 
-      // Actualizar total en backend y frontend
-      const nuevoTotal = calcularTotal(nuevosItems);
+      // Actualizar subtotal, envío y total en backend y frontend
+      const nuevoSubtotal = calcularTotal(nuevosItems);
+      const ordenActual = ordenes.find(o => o.id === editandoId);
+      const envioToSend = determineEnvioForOrder(ordenActual);
+      const nuevoTotal = nuevoSubtotal + envioToSend;
+
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ordenes/${editandoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ total: nuevoTotal }),
+        body: JSON.stringify({ total: nuevoTotal, subtotal: nuevoSubtotal, envio: envioToSend }),
       });
 
       setOrdenes((prev) =>
         prev.map((orden) =>
-          orden.id === editandoId ? { ...orden, total: nuevoTotal } : orden
+          orden.id === editandoId ? { ...orden, total: nuevoTotal, subtotal: nuevoSubtotal, envio: envioToSend } : orden
         )
       );
 

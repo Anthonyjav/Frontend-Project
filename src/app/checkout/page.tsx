@@ -70,13 +70,14 @@ export default function CheckoutPage() {
   // =====================================
   useEffect(() => {
     if (carrito?.items) {
-      const total = carrito.items.reduce(
+      const itemsTotal = carrito.items.reduce(
         (acc: number, item: any) => acc + item.cantidad * item.producto.precio,
         0
       );
-      setForm((prev) => ({ ...prev, amount: total }));
+      const shipping = form.shippingMethod === 'olva' ? 20 : (form.shippingMethod === 'recojo' ? 0 : 0);
+      setForm((prev) => ({ ...prev, amount: itemsTotal + shipping }));
     }
-  }, [carrito]);
+  }, [carrito, form.shippingMethod]);
 
   // Ubigeos: cargar lista plana desde la API pública y preparar selects dependientes
   const [ubigeos, setUbigeos] = useState<any[]>([]);
@@ -170,6 +171,15 @@ export default function CheckoutPage() {
         0
       );
 
+      // Calcular costo de envío según método (OLVA = S/ 20, Recojo = S/ 0)
+      const shippingCost = form.shippingMethod === 'olva' ? 20 : 0;
+
+      // Validar que se haya seleccionado un método de envío
+      if (!form.shippingMethod) {
+        alert('Selecciona un método de envío.');
+        return;
+      }
+
       // Asegurar orderId antes de armar el payload
       const orderIdToUse = form.orderId || generateOrderId();
       if (!form.orderId) setForm(prev => ({ ...prev, orderId: orderIdToUse }));
@@ -179,7 +189,8 @@ export default function CheckoutPage() {
         // Asegurar que el backend reciba orderId y metodoEnvio para persistirlos
         orderId: orderIdToUse,
         metodoEnvio: form.shippingMethod || null,
-        amount: subtotal * 1, // IZIPAY usa centavos
+        amount: (subtotal + shippingCost) * 1, // IZIPAY usa centavos
+        shippingCost: shippingCost,
         currency: form.currency,
         email: form.email,
         firstName: form.firstName,
@@ -202,6 +213,7 @@ export default function CheckoutPage() {
           referencia: form.reference || null,
           distrito: form.city || form.district || null,
           shippingMethod: form.shippingMethod || null,
+          shippingCost: shippingCost,
           items: JSON.stringify(
             carrito.items.map((item: any) => ({
               productoId: item.producto.id,
@@ -390,7 +402,10 @@ useEffect(() => {
 // FORZAR estilos inline en inputs del checkout para evitar overrides externos (temporal)
 // NOTE: Removed temporary inline style enforcer; inputs now use Tailwind-like classes.
 
-
+  // Calcular subtotal y costo de envío para mostrar en el resumen
+  const subtotalCalc = carrito?.items?.reduce((t: number, i: any) => t + i.cantidad * i.producto.precio, 0) || 0;
+  const shippingCost = form.shippingMethod === 'olva' ? 20 : (form.shippingMethod === 'recojo' ? 0 : null);
+  const totalCalc = subtotalCalc + (shippingCost ?? 0);
 
   if (loading) return <p>Cargando...</p>;
 
@@ -508,8 +523,8 @@ useEffect(() => {
                   onChange={(e) => setForm({ ...form, shippingMethod: e.target.value })}
                 >
                   <option value="">Seleccione método de envío</option>
-                  <option value="shalom">Shalom</option>
-                  <option value="olva">Olva Courier</option>
+                  <option value="recojo">Recojo en tienda</option>
+                  <option value="olva">OLVA COURIER</option>
                 </select>
               </div>
               <button
@@ -574,18 +589,14 @@ useEffect(() => {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-gray-700">
               <span>Subtotal</span>
-              <span>
-                S/ {" "}
-                {carrito.items.reduce(
-                  (t: number, i: any) => t + i.cantidad * i.producto.precio,
-                  0
-                )}
-              </span>
+              <span>S/ {subtotalCalc}</span>
             </div>
 
             <div className="flex justify-between text-gray-500">
               <span>Envío</span>
-              <span>Se calcula al ingresar la dirección</span>
+              <span>
+                {shippingCost === null ? 'Se calcula al ingresar la dirección' : shippingCost === 0 ? 'Gratis' : `S/ ${shippingCost}`}
+              </span>
             </div>
           </div>
 
@@ -596,11 +607,7 @@ useEffect(() => {
               </span>
 
               <span className="text-xl font-semibold text-gray-900">
-                S/ {' '}
-                {carrito.items.reduce(
-                  (t: number, i: any) => t + i.cantidad * i.producto.precio,
-                  0
-                )}
+                S/ {totalCalc}
               </span>
             </div>
           )}
